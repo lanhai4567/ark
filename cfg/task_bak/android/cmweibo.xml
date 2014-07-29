@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<task version="1.0" id="cmweibo" name="移动微博业务">
+
+	<start id="start">
+		<transition to="A_androidOpen" name="资源开机" />
+	</start>
+	
+	 <node id="A_androidOpen" name="资源开机" resourcePrefix="resourceA_"  actionType="androidOpen">
+        <param name="sidId" value="${resourceA_.sidSerialNum}"/>
+	 	<param name="sidSlot" value="${resourceA_.sidSlotNum}"/>
+	 	<param name="accountName" value="${accountA[0].name}"/>
+	 	<param name="accountType" value="${taskType}"/>
+	 	<param name="netType" value="${resourceA_.netType}"/>
+        <transition to="A_login" expression="${A_androidOpen.resultCode == 'SUCCESS'}" name="开机成功" />
+        <transition to="A_interrupt" expression="${A_androidOpen.resultCode != 'SUCCESS'}" name="开机失败，中断" />
+    </node>
+	
+	<node id="A_login" name="登陆移动微博" resourcePrefix="resourceA_"  actionType="CMWEIBO_LOGIN_ACTION">
+		<param name="account" value="${accountA[0]}"/>
+		<transition to="A_send" expression="${A_login.resultCode == 'SUCCESS'}" name="登陆成功" />
+		<transition to="A_interrupt_continue" expression="${isChangeAccountAgain(A_login,accountA,null,null)}" name="出现验证码" />
+		<transition to="A_interrupt" name="登陆失败，中断" />
+	</node>
+	
+	<!-- 重试 -->
+	<node id="A_interrupt_continue" name="资源中断" resourcePrefix="resourceA_" actionType="rtdRelease">
+		<transition to="A_androidOpen_again" />
+	</node>
+	
+	<node id="A_androidOpen_again" name="资源开机" resourcePrefix="resourceA_"  actionType="androidOpen">
+	 	<param name="sidId" value="${resourceA_.sidSerialNum}"/>
+	 	<param name="sidSlot" value="${resourceA_.sidSlotNum}"/>
+	 	<param name="accountName" value="${accountA[1].name}"/>
+	 	<param name="netType" value="${resourceA_.netType}"/>
+	 	<param name="accountType" value="${taskType}"/>
+        <transition to="A_login_again" expression="${A_androidOpen_again.resultCode == 'SUCCESS'}" name="开机成功" />
+        <transition to="A_interrupt" expression="${A_androidOpen_again.resultCode != 'SUCCESS'}" name="开机失败，中断" />
+    </node>
+    
+    <node id="A_login_again" name="登陆移动微博" resourcePrefix="resourceA_"  actionType="CMWEIBO_LOGIN_ACTION">
+		<param name="account" value="${accountA[1]}"/>
+		<transition to="A_send" expression="${A_login_again.resultCode == 'SUCCESS'}" name="登陆成功" />
+		<transition to="A_interrupt" name="登陆失败，中断" />
+	</node>
+    
+	<!-- 业务 -->
+	<node id="A_send" name="发表纯文本" resourcePrefix="resourceA_"  actionType="CMWEIBO_SEND_ACTION">
+		<param name="content" value="${content}"/>
+		<transition to="A_sendImg" expression="${A_send.resultCode =='SUCCESS'}" name="发表成功" />
+		<transition to="A_exitAndInterrupt" expression="${A_send.resultCode != 'SUCCESS'}" name="发表失败，中断" />
+	</node>
+	
+	<node id="A_sendImg" name="发表图片" resourcePrefix="resourceA_"  actionType="CMWEIBO_SEND_IMG_ACTION">
+		<param name="imgName" value="${imgName}"/>
+		<transition to="A_exit" expression="${A_sendImg.resultCode =='SUCCESS'}" name="发表成功" />
+		<transition to="A_exitAndInterrupt" expression="${A_sendImg.resultCode != 'SUCCESS'}" name="发表失败，中断" />
+	</node>
+	
+	<node id="A_exit" name="登出移动微博" resourcePrefix="resourceA_"  actionType="CMWEIBO_EXIT_ACTION">
+		<transition to="A_androidClose" expression="${A_exit.resultCode =='SUCCESS'}" name="登出成功" />
+		<transition to="A_interrupt" expression="${A_exit.resultCode != 'SUCCESS'}" name="登出失败，中断" />
+	</node>
+	
+	<node id="A_androidClose" name="资源释放" resourcePrefix="resourceA_" actionType="androidClose">
+		<transition to="end" />
+	</node>
+	
+	<node id="A_exitAndInterrupt" name="退出登录" resourcePrefix="resourceA_" actionType="CMWEIBO_EXIT_ACTION">
+		<transition to="A_interrupt" />
+	</node>
+
+	<node id="A_interrupt" name="资源中断" resourcePrefix="resourceA_" actionType="rtdRelease">
+		<transition to="end" />
+	</node>
+	
+	<end id="end" />
+	
+	<result>
+		<variable code="resultCode" name="结果码" value="${resultCode}"  javaType="String"  description=""/>
+		<variable code="errorDescription" name="错误描述" value="${errorDescription}"  javaType="String"  description=""/>
+		<variable code="loginDelay" name="登陆时长" value="${interval(A_login.loginEndTime,A_login.loginRequestTime)}"  javaType="Float"  description="公式：登陆完成时间点-登陆请求时间点"/>
+		<variable code="textSendDelay" name="文本发送时长" value="${interval(A_send.msgSendEndTime,A_send.msgSendTime)}"  javaType="Float"  description="公式：发送文本完成时间点 - 发送文本开始时间点 "/>
+		<variable code="imgSendDelay" name="图片发送时长" value="${interval(A_sendImg.imgSendEndTime,A_sendImg.imgSendTime)}"  javaType="Float"  description="公式：发送图片完成时间点 - 发送图片开始时间点"/>
+	</result>
+</task>

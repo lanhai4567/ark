@@ -1,0 +1,45 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<task version="1.0" id="ftpUp" name="ftp上传测试业务">
+
+	<start id="start">
+		<transition to="A_androidOpen" name="资源开机" />
+	</start>
+	
+	 <node id="A_androidOpen" name="资源开机" resourcePrefix="resourceA_"  actionType="androidOpen">
+        <param name="sidId" value="${resourceA_.sidSerialNum}"/>
+	 	<param name="sidSlot" value="${resourceA_.sidSlotNum}"/>
+	 	<param name="accountName" value="${accountA[0].name}"/>
+	 	<param name="accountType" value="${taskType}"/>
+	 	<param name="netType" value="${resourceA_.netType}"/>
+        <transition to="A_ftpUp" expression="${A_androidOpen.resultCode == 'SUCCESS'}" name="开机成功" />
+        <transition to="A_interrupt" expression="${A_androidOpen.resultCode != 'SUCCESS'}" name="开机失败，中断" />
+    </node>
+	
+	<node id="A_ftpUp" name="ftp上传" resourcePrefix="resourceA_"  actionType="FTP_UP">
+		<param name="url" value="${url}"/>
+		<param name="ftpUserName" value="${ftpUserName}"/>
+		<param name="ftpPassword" value="${ftpPassword}"/>
+		<param name="uploadFile" value="${uploadFile}"/>
+		<transition to="A_androidClose" name="释放资源" />
+	</node>
+	
+	<node id="A_androidClose" name="释放资源" resourcePrefix="resourceA_" actionType="androidClose">
+		<transition to="end" />
+	</node>
+
+	<node id="A_interrupt" name="资源中断" resourcePrefix="resourceA_" actionType="rtdRelease">
+		<transition to="end" />
+	</node>
+	
+	<end id="end" />
+	
+	<result>
+		<variable code="resultCode" name="结果码" value="${resultCode}"  javaType="String"  description=""/>
+		<variable code="errorDescription" name="错误描述" value="${errorDescription}"  javaType="String"  description=""/>
+		<variable code="uploadTime" name="上传开始时间" value="${A_ftpUp.uploadTime}"  javaType="String"  description=""/>
+		<variable code="uploadedTime" name="上传结束时间" value="${A_ftpUp.uploadedTime}"  javaType="String"  description=""/>
+		<!-- 根据项目需要，在JS中进行了单位转换 -->
+		<variable code="uploadSize" name="上传大小，单位KB" value="${divide(A_ftpUp.uploadSize,1024)}"  javaType="Integer"  description=""/>
+		<variable code="uploadRate" name="上传速率，单位KB/s" value="${divide(divide(A_ftpUp.uploadSize,1024),interval(A_ftpUp.uploadedTime,A_ftpUp.uploadTime))}"  javaType="Integer"  description=""/>
+	</result>
+</task>

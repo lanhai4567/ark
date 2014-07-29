@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<task version="1.0" id="notifyVoice" name="通知音">
+
+	<start id="start">
+ 		<transition to="initial"  name="设备初始化"/>
+	</start>
+	
+	<!-- 初始化  -->
+	<fork id="initial" name="设备初始化" join="initial_join">
+		<transition to="A_checkRegister"/>
+		<transition to="B_checkRegister"/>
+	</fork>
+	
+	<!--  A -->
+    <node id="A_checkRegister" name="A_检测网络登记" resourcePrefix="resourceA_" actionType="checkRegister">
+        <param name="msisdn" value="${resourceA_.testNum}"/>
+        <transition to="A_powerOn" expression=" ${A_checkRegister.status != 0}" name="未开机" />
+        <transition to="initial_join" name="已开机" />
+    </node>
+
+	<node id="A_powerOn" name="A_模块加电" resourcePrefix="resourceA_" actionType="powerOn">
+		<param name="cardType" value="${resourceA_.cardType}"/>
+    	<param name="sidId" value="${resourceA_.sidSerialNum}"/>
+     	<param name="sidSlot" value="${resourceA_.sidSlotNum}"/>
+     	<param name="msisdn" value="${resourceA_.testNum}"/>
+		<transition to="A_register" expression=" ${A_powerOn.resultCode == 'SUCCESS'}" name="加电成功" />
+		<transition to="initial_join" expression="${A_powerOn.resultCode != 'SUCCESS'}" name="加电失败" />
+	</node>
+	
+	<node id="A_register" name="A_登记网络" resourcePrefix="resourceA_" actionType="register">
+		<param name="netType" value="${resourceA_.netType}"/>
+		<transition to="initial_join" name="网络成功或失败" />	
+	</node>
+	
+	<!--  B -->
+    <node id="B_checkRegister" name="B_检测网络登记" resourcePrefix="resourceB_" actionType="checkRegister">
+        <param name="msisdn" value="${resourceB_.testNum}"/>
+        <transition to="B_powerOn" expression=" ${B_checkRegister.status != 0}" name="未开机" />
+        <transition to="initial_join" name="已开机" />
+    </node>
+    
+	<node id="B_powerOn" name="B_模块加电" resourcePrefix="resourceB_" actionType="powerOn">
+		<param name="cardType" value="${resourceB_.cardType}"/>
+    	<param name="sidId" value="${resourceB_.sidSerialNum}"/>
+     	<param name="sidSlot" value="${resourceB_.sidSlotNum}"/>
+     	<param name="msisdn" value="${resourceB_.testNum}"/>
+		<transition to="B_register" expression=" ${B_powerOn.resultCode =='SUCCESS'}" name="加电成功" />
+		<transition to="initial_join" expression="${B_powerOn.resultCode != 'SUCCESS'}" name="加电失败" />
+	</node>
+	
+	<node id="B_register" name="B_登记网络" resourcePrefix="resourceB_" actionType="register">
+		<param name="netType" value="${resourceB_.netType}"/>
+		<transition to="initial_join" name="网络成功或失败" />	
+	</node>
+	
+	<join id="initial_join" name="资源初始化聚合">
+		<transition to="A_voiceCall" expression ="${(A_checkRegister.status == 0 || A_register.resultCode == 'SUCCESS') &amp;&amp; (B_checkRegister.status == 0 || B_register.resultCode == 'SUCCESS')}" name="初始化成功" />
+		<transition to="turnOff"  name="初始化失败" />
+	</join>
+    
+	<!-- 开始做业务 -->
+	
+	<node id="A_voiceCall" name="主叫语音呼叫" resourcePrefix="resourceA_"  actionType="voiceCall">
+		<param name="calledNumber" value="${resourceB_.testNum}" />
+		<param name="recordLength" value="${recordLength}" />
+		<transition to="A_hangupVoiceCall" name="成功或失败" />
+	</node>
+	
+	<node id="A_hangupVoiceCall" name="主叫挂机"  resourcePrefix="resourceA_" actionType="hangupVoiceCall">
+		<transition to="turnOff" />
+	</node>
+
+	<fork id="turnOff" name="资源释放" join="turnOff_join">
+        <transition to="A_powerOff" expression="${A_register.resultCode != 'SUCCESS' &amp;&amp; A_powerOn.resoultCode == 'SUCCESS'}"/>
+        <transition to="B_powerOff" expression="${B_register.resultCode  != 'SUCCESS' &amp;&amp; B_powerOn.resoultCode == 'SUCCESS'}"/>
+		<transition to="A_unregister" expression="${resourceA_close == true &amp;&amp; (A_checkRegister.resultCode == 0 || A_register.resultCode == 'SUCCESS')}"/>
+		<transition to="B_unregister" expression="${resourceB_close == true &amp;&amp; (B_checkRegister.resultCode == 0 || B_register.resultCode == 'SUCCESS')}"/>
+	</fork>
+	
+	<node id="A_unregister" name="A_注销网络" resourcePrefix="resourceA_" actionType="unregister">
+		<transition to="A_powerOff" />
+	</node>
+
+	<node id="A_powerOff" name="A_模块断电" resourcePrefix="resourceA_" actionType="powerOff">
+		<transition to="turnOff_join" />
+	</node>
+
+	<node id="B_unregister" name="B_注销网络" resourcePrefix="resourceB_" actionType="unregister">
+		<transition to="B_powerOff" />
+	</node>
+
+	<node id="B_powerOff" name="B_模块断电" resourcePrefix="resourceB_" actionType="powerOff">
+		<transition to="turnOff_join" />
+	</node>
+
+	<join id="turnOff_join">
+		<transition to="end"></transition>
+	</join>
+	
+	<end id="end" name="流程结束" />
+
+	<result>
+		<variable code="resultCode" name="结果码" value="${resultCode}"  javaType="String"  description=""/>
+		<variable code="errorDescription" name="错误描述" value="${errorDescription}"  javaType="String"  description=""/>
+		<variable code="callTime" name="拨号时间"  value="${A_voiceCall.callTime}"  javaType="Date" description="语音呼叫动作"/>
+		<variable code="callRingTime" name="主叫振铃时间"  value="${A_voiceCall.callRingTime}"  javaType="Date" description="语音呼叫动作的callRingTime"/>
+		<variable code="hangupTime" name="主叫挂机时间"  value="${A_hangupVoiceCall.hangupTime}"  javaType="Date"  description="主叫语音挂机动作"/>
+		<variable code="noticeFile" name="通知音录音"	 value="${A_voiceCall.recordFile}"  javaType="String"  description="语音呼叫动作的recordFile"/>
+	</result>
+</task>

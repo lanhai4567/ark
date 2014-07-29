@@ -1,0 +1,49 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<task version="1.0" id="http" name="http测试业务">
+
+	<start id="start">
+		<transition to="A_androidOpen" name="资源开机" />
+	</start>
+	
+	 <node id="A_androidOpen" name="资源开机" resourcePrefix="resourceA_"  actionType="androidOpen">
+        <param name="sidId" value="${resourceA_.sidSerialNum}"/>
+	 	<param name="sidSlot" value="${resourceA_.sidSlotNum}"/>
+	 	<param name="accountName" value="${accountA[0].name}"/>
+	 	<param name="accountType" value="${taskType}"/>
+	 	<param name="netType" value="${resourceA_.netType}"/>
+        <transition to="A_http" expression="${A_androidOpen.resultCode == 'SUCCESS'}" name="开机成功" />
+        <transition to="A_interrupt" expression="${A_androidOpen.resultCode != 'SUCCESS'}" name="开机失败，中断" />
+    </node>
+	
+	<node id="A_http" name="HTTP访问" resourcePrefix="resourceA_"  actionType="HTTP">
+		<param name="url" value="${url}"/>
+		<transition to="A_androidClose" name="释放资源" />
+	</node>
+	
+	<node id="A_androidClose" name="释放资源" resourcePrefix="resourceA_" actionType="androidClose">
+		<transition to="end" />
+	</node>
+
+	<node id="A_interrupt" name="资源中断" resourcePrefix="resourceA_" actionType="rtdRelease">
+		<transition to="end" />
+	</node>
+	
+	<end id="end" />
+	
+	<result>
+		<variable code="resultCode" name="结果码" value="${resultCode}"  javaType="String"  description=""/>
+		<variable code="errorDescription" name="错误描述" value="${errorDescription}"  javaType="String"  description=""/>
+		<!--
+			<variable code="androidOpenTime" name="pdp开始时间" value="${A_androidOpen.androidOpenTime}"  javaType="String"  description=""/>
+			<variable code="androidOpenedTime" name="pdp结束时间" value="${A_androidOpen.androidOpenedTime}"  javaType="String"  description=""/>
+		-->
+		<variable code="dnsAnalyseTime" name="DNS开始解析时间" value="${A_http.dnsAnalyseTime}"   javaType="String" description="HTTP动作"/>
+		<variable code="dnsAnalysedTime" name="DNS解析完成时间" value="${A_http.dnsAnalysedTime}"   javaType="String" description="HTTP动作"/>
+		<variable code="connectTime" name="第一次握手时间" value="${A_http.connectTime}"   javaType="String" description="HTTP动作"/>
+		<variable code="connectedTime" name="第三次握手时间" value="${A_http.connectedTime}"   javaType="String" description="HTTP动作"/>
+		<variable code="downloadTime" name="访问开始时间" value="${A_http.downloadTime}"  javaType="String"  description="HTTP动作"/>
+		<variable code="downloadedTime" name="访问结束时间" value="${A_http.downloadedTime}"  javaType="String"  description="HTTP动作"/>
+		<!-- 根据项目需要，在JS中进行了单位转换 -->
+		<variable code="downloadSize" name="页面大小" value="${divide(A_http.downloadSize,1024)}"  javaType="int"  description="HTTP动作"/>
+	</result>
+</task>

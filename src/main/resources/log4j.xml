@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE log4j:configuration SYSTEM "log4j.dtd">
+<log4j:configuration xmlns:log4j="http://jakarta.apache.org/log4j/" debug="false">
+
+<!--
+设置通道名称和输出方式，其中输出方式appender有5种,分别为:
+org.apache.log4j.FileAppender (文件)
+org.apache.log4j.ConsoleAppender (控制台)
+org.apache.log4j.RollingFileAppender (根据文件大小创建新文件)
+org.apache.log4j.DailyRollingFileAppender (每天产生一个日志文件)
+org.apache.log4j.WriterAppender (将日志信息以流格式发送到指定地方)
+-->
+<appender name="CONSOLE" class="org.apache.log4j.ConsoleAppender">
+	<!-- 定义控制台日志级别入口  -->
+	<param name="Threshold" value="DEBUG"/>
+	<param name="Target" value="System.out" />
+	<layout class="org.apache.log4j.PatternLayout">
+		<param name="ConversionPattern" value="%d{yyyy/MM/dd HH:mm:ss.SSS} | %-5p | %-10t | %c{1} %m%n"/>
+	</layout>
+</appender>
+
+<appender name="DEBUG" class="org.apache.log4j.RollingFileAppender">
+	<param name="File" value="debug.log"/>
+	<param name="Append" value="true" />
+	<param name="Threshold" value="DEBUG"/>
+	<param name="BufferSize" value="8192" />
+	<param name="MaxFileSize" value="200MB" />
+	<param name="MaxBackupIndex" value="100" />
+	<param name="DatePattern" value="'.'yyyy-MM-dd-HH'.log'"/>
+	<layout class="org.apache.log4j.PatternLayout">
+		<param name="ConversionPattern" value="%d{yyyy/MM/dd HH:mm:ss.SSS} | %-5p | %-10t |  %c{1} %m%n"/>
+	</layout>
+	<filter class="org.apache.log4j.varia.LevelRangeFilter">
+		<param name="LevelMin" value="DEBUG"/>
+		<param name="LevelMax" value="DEBUG"/>
+	</filter>
+</appender>
+
+ <!-- 每天生成一个文件,注意由于window不支持特殊字符命名，在配置DatePattern是不能用"："-->
+<appender name="INFO" class="org.apache.log4j.DailyRollingFileAppender">
+	<param name="Threshold" value="INFO"/>
+	<param name="File" value="info.log"/>
+	<param name="BufferSize" value="8192" />
+	<param name="MaxFileSize" value="200MB" />
+	<param name="MaxBackupIndex" value="100" />
+	<param name="DatePattern" value="'.'yyyy-MM-dd-HH'.log'"/>
+	<layout class="org.apache.log4j.PatternLayout">
+		<param name="ConversionPattern" value="%d{yyyy/MM/dd HH:mm:ss.SSS} | %-5p | %-10t |  %c{1} %m%n"/>
+	</layout>
+	
+	<!-- 过滤器只记录info级别的日志，以下同  -->
+	<filter class="org.apache.log4j.varia.LevelRangeFilter">
+		<param name="LevelMin" value="INFO"/>
+		<param name="LevelMax" value="INFO"/>
+	</filter>
+</appender>
+
+<!-- warn -->
+<appender name="WARN" class="org.apache.log4j.FileAppender">
+	<param name="Threshold" value="WARN"/>
+	<param name="File" value="warn.log"/>
+	<layout class="org.apache.log4j.PatternLayout">
+		<param name="ConversionPattern" value="%d{yyyy/MM/dd HH:mm:ss.SSS} %-5p %c{1} %m%n"/>
+	</layout>
+	<filter class="org.apache.log4j.varia.LevelRangeFilter">
+		<param name="LevelMin" value="WARN"/>
+		<param name="LevelMax" value="WARN"/>
+	</filter>
+</appender>
+
+<!-- error -->
+<appender name="ERROR" class="org.apache.log4j.FileAppender">
+	<param name="Threshold" value="ERROR"/>
+	<param name="File" value="error.log"/>
+	<layout class="org.apache.log4j.PatternLayout">
+		<param name="ConversionPattern" value="%d{yyyy/MM/dd HH:mm:ss.SSS} %-5p %c{1} %m%n"/>
+	</layout>
+	<filter class="org.apache.log4j.varia.LevelRangeFilter">
+		<param name="LevelMin" value="ERROR"/>
+		<param name="LevelMax" value="ERROR"/>
+	</filter>
+</appender>
+
+<!-- fatal -->
+<appender name="FATAL" class="org.apache.log4j.FileAppender">
+	<param name="Threshold" value="FATAL"/>
+	<param name="File" value="fatal.log"/>
+	<layout class="org.apache.log4j.PatternLayout">
+		<param name="ConversionPattern" value="%d{yyyy/MM/dd HH:mm:ss.SSS} %-5p %c{1} %m%n"/>
+	</layout>
+	<filter class="org.apache.log4j.varia.LevelRangeFilter">
+		<param name="LevelMin" value="FATAL"/>
+		<param name="LevelMax" value="FATAL"/>
+	</filter>
+</appender>
+
+<!-- rtdModuleCellIfno -->
+<appender name="RTDCELL" class="org.apache.log4j.DailyRollingFileAppender">
+	<param name="Threshold" value="INFO"/>
+	<param name="File" value="cellinfo/cellinfo"/>
+	<param name="DatePattern" value="'.'yyyy-MM-dd-HH-mm'.txt'"/>
+	<layout class="org.apache.log4j.PatternLayout">
+		<param name="ConversionPattern" value="%m%n"/>
+	</layout>
+	<filter class="org.apache.log4j.varia.LevelRangeFilter">
+		<param name="LevelMin" value="INFO"/>
+		<param name="LevelMax" value="INFO"/>
+	</filter>
+</appender>
+
+<category  name="com.etone.ark.kernel.service.ModuleNetInfoServer"  additivity="false" >
+	<level value="INFO"/>
+	<appender-ref ref="RTDCELL"/>
+</category >
+<root>
+	<level value="DEBUG"/><!-- 定义日志级别 -->
+	<appender-ref ref="DEBUG"/>
+	<appender-ref ref="CONSOLE"/>
+	<appender-ref ref="ERROR"/>
+ </root>
+</log4j:configuration>

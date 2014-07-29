@@ -1,0 +1,468 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<protocols version="1.0">
+	<protocol code="androidLogin" name="Android设备登陆" timeout="120">
+		<request command="androidLogin" type="json"></request>
+		<response command="androidLogin" type="json">
+			<parameter name="status" value=""/>
+			<parameter name="systemId" value=""/>
+			<parameter name="systemTime" value=""/>
+			<parameter name="ftpRootDir" value=""/>
+			<parameter name="heartBeatPeriod" value=""/>
+			<parameter name="deviceIp" value=""/>
+		</response>
+	</protocol>
+	
+	<protocol code="androidHeart" name="Android设备心跳" timeout="120">
+		<request command="androidHeart" type="json"></request>
+		<response command="androidHeart" type="json">
+			<parameter name="status" value=""/>
+			<parameter name="systemTime" value=""/>
+		</response>
+	</protocol>
+	<protocol code="androidOpen" name="Android设备开机" timeout="360">
+		<request command="androidOpen" type="json">
+			<parameter name="sidId" value=""></parameter>
+			<parameter name="sidSlot" value=""></parameter>
+			<parameter name="moduleType" value="16"></parameter>
+			<parameter name="netType" value=""></parameter>
+			<parameter name="accountName" value=""></parameter>
+			<parameter name="accountType" value=""></parameter>
+		</request>
+		<response command="androidOpen" type="json">
+			<parameter name="resultCode" value=""></parameter>
+			<parameter name="errorDescription" value=""></parameter>
+		</response>
+	</protocol>
+	<protocol code="androidClose" name="Android设备关机" timeout="120">
+		<request command="androidClose" type="json"></request>
+		<response command="androidClose" type="json">
+			<parameter name="resultCode" value=""></parameter>
+			<parameter name="errorDescription" value=""></parameter>
+		</response>
+	</protocol>
+	<protocol code="QQ_LOGIN_ACTION" name="QQ登陆" timeout="120">
+		<request command="QQ_LOGIN_ACTION" type="json">
+			<parameter name="account" value=""></parameter>
+		</request>
+		<response command="QQ_LOGIN_ACTION" type="json">
+			<parameter name="resultCode" value=""></parameter>
+			<parameter name="errorDescription" value=""></parameter>
+		</response>
+	</protocol>
+	<protocol code="QQ_SEND_ACTION" name="QQ发送文本消息" timeout="120">
+		<request command="QQ_SEND_ACTION" type="json">
+			<parameter name="accountName" value=""></parameter>
+			<parameter name="content" value=""></parameter>
+		</request>
+		<response command="QQ_SEND_ACTION" type="json">
+			<parameter name="resultCode" value=""></parameter>
+			<parameter name="errorDescription" value=""></parameter>
+		</response>
+	</protocol>
+	<protocol code="QQ_SEND_IMG_ACTION" name="QQ发送图片消息" timeout="120">
+		<request command="QQ_SEND_IMG_ACTION" type="json">
+			<parameter name="accountName" value=""></parameter>
+			<parameter name="imgName" value=""></parameter>
+		</request>
+		<response command="QQ_SEND_IMG_ACTION" type="json">
+			<parameter name="resultCode" value=""></parameter>
+			<parameter name="errorDescription" value=""></parameter>
+		</response>
+	</protocol>
+	<protocol code="QQ_RECEIVE_ACTION" name="QQ接收文本消息" timeout="120">
+		<request command="QQ_RECEIVE_ACTION" type="json">
+			<parameter name="accountName" value=""></parameter>
+			<parameter name="contrastText" value=""></parameter>
+		</request>
+		<response command="QQ_RECEIVE_ACTION" type="json">
+			<parameter name="resultCode" value=""></parameter>
+			<parameter name="errorDescription" value=""></parameter>
+		</response>
+	</protocol>
+	<protocol code="QQ_RECEIVE_IMG_ACTION" name="QQ接收图片消息" timeout="120">
+		<request command="QQ_RECEIVE_IMG_ACTION" type="json">
+			<parameter name="accountName" value=""></parameter>
+			<parameter name="contrastImgName" value=""></parameter>
+		</request>
+		<response command="QQ_RECEIVE_IMG_ACTION" type="json">
+			<parameter name="resultCode" value=""></parameter>
+			<parameter name="errorDescription" value=""></parameter>
+		</response>
+	</protocol>
+	<protocol code="QQ_EXIT_ACTION" name="QQ退出" timeout="120">
+		<request command="QQ_EXIT_ACTION" type="json"></request>
+		<response command="QQ_EXIT_ACTION" type="json">
+			<parameter name="resultCode" value=""></parameter>
+			<parameter name="errorDescription" value=""></parameter>
+		</response>
+	</protocol>
+	<protocol code="FETION_LOGIN_ACTION" name="飞信登陆" timeout="120">
+		<request command="FETION_LOGIN_ACTION" type="json">
+			<parameter name="account" value=""></parameter>
+		</request>
+		<response command="FETION_LOGIN_ACTION" type="json">
+			<parameter name="resultCode" value=""></parameter>
+			<parameter name="errorDescription" value=""></parameter>
+		</response>
+	</protocol>
+	<protocol code="FETION_SEND_ACTION" name="飞信发送文本消息" timeout="120">
+		<request command="FETION_SEND_ACTION" type="json">
+			<parameter name="accountName" value=""></parameter>
+			<parameter name="content" value=""></parameter>
+		</request>
+		<response command="FETION_SEND_ACTION" type="json">
+			<parameter name="resultCode" value=""></parameter>
+			<parameter name="errorDescription" value=""></parameter>
+		</response>
+	</protocol>
+	<protocol code="FETION_SEND_IMG_ACTION" name="飞信发送图片消息" timeout="120">
+		<request command="FETION_SEND_IMG_ACTION" type="json">
+			<parameter name="accountName" value=""></parameter>
+			<parameter name="imgName" value=""></parameter>
+		</request>
+		<response command="FETION_SEND_IMG_ACTION" type="json">
+			<parameter name="resultCode" value=""></parameter>
+			<parameter name="errorDescription" value=""></parameter>
+		</response>
+	</protocol>
+	<protocol code="FETION_RECEIVE_ACTION" name="飞信接收文本消息" timeout="120">
+		<request command="FETION_RECEIVE_ACTION" type="json">
+			<parameter name="accountName" value=""></parameter>
+			<parameter name="contrastText" value=""></parameter>
+		</request>
+		<response command="FETION_RECEIVE_ACTION" type="json">
+			<parameter name="resultCode" value=""></parameter>
+			<parameter name="errorDescription" value=""></parameter>
+		</response>
+	</protocol>
+	<protocol code="FETION_RECEIVE_IMG_ACTION" name="飞信接收图片消息" timeout="120">
+		<request command="FETION_RECEIVE_IMG_ACTION" type="json">
+			<parameter name="accountName" value=""></parameter>
+			<parameter name="contrastImgName" value=""></parameter>
+		</request>
+		<response command="FETION_RECEIVE_IMG_ACTION" type="json">
+			<parameter name="resultCode" value=""></parameter>
+			<parameter name="errorDescription" value=""></parameter>
+		</response>
+	</protocol>
+	<protocol code="FETION_EXIT_ACTION" name="飞信退出" timeout="120">
+		<request command="FETION_EXIT_ACTION" type="json"></request>
+		<response command="FETION_EXIT_ACTION" type="json">
+			<parameter name="resultCode" value=""></parameter>
+			<parameter name="errorDescription" value=""></parameter>
+		</response>
+	</protocol>
+	<protocol code="FEILIAO_LOGIN_ACTION" name="飞聊登陆" timeout="120">
+		<request command="FEILIAO_LOGIN_ACTION" type="json">
+			<parameter name="account" value=""></parameter>
+		</request>
+		<response command="FEILIAO_LOGIN_ACTION" type="json">
+			<parameter name="resultCode" value=""></parameter>
+			<parameter name="errorDescription" value=""></parameter>
+		</response>
+	</protocol>
+	<protocol code="FEILIAO_SEND_ACTION" name="飞聊发送文本消息" timeout="120">
+		<request command="FEILIAO_SEND_ACTION" type="json">
+			<parameter name="accountName" value=""></parameter>
+			<parameter name="content" value=""></parameter>
+		</request>
+		<response command="FEILIAO_SEND_ACTION" type="json">
+			<parameter name="resultCode" value=""></parameter>
+			<parameter name="errorDescription" value=""></parameter>
+		</response>
+	</protocol>
+	<protocol code="FEILIAO_SEND_IMG_ACTION" name="飞聊发送图片消息" timeout="120">
+		<request command="FEILIAO_SEND_IMG_ACTION" type="json">
+			<parameter name="accountName" value=""></parameter>
+			<parameter name="imgName" value=""></parameter>
+		</request>
+		<response command="FEILIAO_SEND_IMG_ACTION" type="json">
+			<parameter name="resultCode" value=""></parameter>
+			<parameter name="errorDescription" value=""></parameter>
+		</response>
+	</protocol>
+	<protocol code="FEILIAO_RECEIVE_ACTION" name="飞聊接收文本消息" timeout="120">
+		<request command="FEILIAO_RECEIVE_ACTION" type="json">
+			<parameter name="accountName" value=""></parameter>
+			<parameter name="contrastText" value=""></parameter>
+		</request>
+		<response command="FEILIAO_RECEIVE_ACTION" type="json">
+			<parameter name="resultCode" value=""></parameter>
+			<parameter name="errorDescription" value=""></parameter>
+		</response>
+	</protocol>
+	<protocol code="FEILIAO_RECEIVE_IMG_ACTION" name="飞聊接收图片消息" timeout="120">
+		<request command="FEILIAO_RECEIVE_IMG_ACTION" type="json">
+			<parameter name="accountName" value=""></parameter>
+			<parameter name="contrastImgName" value=""></parameter>
+		</request>
+		<response command="FEILIAO_RECEIVE_IMG_ACTION" type="json">
+			<parameter name="resultCode" value=""></parameter>
+			<parameter name="errorDescription" value=""></parameter>
+		</response>
+	</protocol>
+	<protocol code="FEILIAO_EXIT_ACTION" name="飞聊退出" timeout="120">
+		<request command="FEILIAO_EXIT_ACTION" type="json"></request>
+		<response command="FEILIAO_EXIT_ACTION" type="json">
+			<parameter name="resultCode" value=""></parameter>
+			<parameter name="errorDescription" value=""></parameter>
+		</response>
+	</protocol>
+	<protocol code="WECHAT_LOGIN_ACTION" name="微信登陆" timeout="120">
+		<request command="WECHAT_LOGIN_ACTION" type="json">
+			<parameter name="account" value=""></parameter>
+		</request>
+		<response command="WECHAT_LOGIN_ACTION" type="json">
+			<parameter name="resultCode" value=""></parameter>
+			<parameter name="errorDescription" value=""></parameter>
+		</response>
+	</protocol>
+	<protocol code="WECHAT_SEND_ACTION" name="微信发送文本消息" timeout="120">
+		<request command="WECHAT_SEND_ACTION" type="json">
+			<parameter name="accountName" value=""></parameter>
+			<parameter name="content" value=""></parameter>
+		</request>
+		<response command="WECHAT_SEND_ACTION" type="json">
+			<parameter name="resultCode" value=""></parameter>
+			<parameter name="errorDescription" value=""></parameter>
+		</response>
+	</protocol>
+	<protocol code="WECHAT_SEND_IMG_ACTION" name="微信发送图片消息" timeout="120">
+		<request command="WECHAT_SEND_IMG_ACTION" type="json">
+			<parameter name="accountName" value=""></parameter>
+			<parameter name="imgName" value=""></parameter>
+		</request>
+		<response command="WECHAT_SEND_IMG_ACTION" type="json">
+			<parameter name="resultCode" value=""></parameter>
+			<parameter name="errorDescription" value=""></parameter>
+		</response>
+	</protocol>
+	<protocol code="WECHAT_RECEIVE_ACTION" name="微信接收文本消息" timeout="120">
+		<request command="WECHAT_RECEIVE_ACTION" type="json">
+			<parameter name="accountName" value=""></parameter>
+			<parameter name="contrastText" value=""></parameter>
+		</request>
+		<response command="WECHAT_RECEIVE_ACTION" type="json">
+			<parameter name="resultCode" value=""></parameter>
+			<parameter name="errorDescription" value=""></parameter>
+		</response>
+	</protocol>
+	<protocol code="WECHAT_RECEIVE_IMG_ACTION" name="微信接收图片消息" timeout="120">
+		<request command="WECHAT_RECEIVE_IMG_ACTION" type="json">
+			<parameter name="accountName" value=""></parameter>
+			<parameter name="contrastImgName" value=""></parameter>
+		</request>
+		<response command="WECHAT_RECEIVE_IMG_ACTION" type="json">
+			<parameter name="resultCode" value=""></parameter>
+			<parameter name="errorDescription" value=""></parameter>
+		</response>
+	</protocol>
+	<protocol code="WECHAT_EXIT_ACTION" name="微信退出" timeout="120">
+		<request command="WECHAT_EXIT_ACTION" type="json"></request>
+		<response command="WECHAT_EXIT_ACTION" type="json">
+			<parameter name="resultCode" value=""></parameter>
+			<parameter name="errorDescription" value=""></parameter>
+		</response>
+	</protocol>
+	<protocol code="SINAWEIBO_LOGIN_ACTION" name="新浪微博登陆" timeout="120">
+		<request command="SINAWEIBO_LOGIN_ACTION" type="json">
+			<parameter name="account" value=""></parameter>
+		</request>
+		<response command="SINAWEIBO_LOGIN_ACTION" type="json">
+			<parameter name="resultCode" value=""></parameter>
+			<parameter name="errorDescription" value=""></parameter>
+		</response>
+	</protocol>
+	<protocol code="SINAWEIBO_SEND_ACTION" name="新浪微博发表纯文本" timeout="120">
+		<request command="SINAWEIBO_SEND_ACTION" type="json">
+			<parameter name="content" value=""></parameter>
+		</request>
+		<response command="SINAWEIBO_SEND_ACTION" type="json">
+			<parameter name="resultCode" value=""></parameter>
+			<parameter name="errorDescription" value=""></parameter>
+		</response>
+	</protocol>
+	<protocol code="SINAWEIBO_SEND_IMG_ACTION" name="新浪微博发表图片" timeout="120">
+		<request command="SINAWEIBO_SEND_IMG_ACTION" type="json">
+			<parameter name="imgName" value=""></parameter>
+		</request>
+		<response command="SINAWEIBO_SEND_IMG_ACTION" type="json">
+			<parameter name="resultCode" value=""></parameter>
+			<parameter name="errorDescription" value=""></parameter>
+		</response>
+	</protocol>
+	<protocol code="SINAWEIBO_EXIT_ACTION" name="新浪微博退出" timeout="120">
+		<request command="SINAWEIBO_EXIT_ACTION" type="json"></request>
+		<response command="SINAWEIBO_EXIT_ACTION" type="json">
+			<parameter name="resultCode" value=""></parameter>
+			<parameter name="errorDescription" value=""></parameter>
+		</response>
+	</protocol>
+	<protocol code="CMWEIBO_LOGIN_ACTION" name="移动微博登陆" timeout="120">
+		<request command="CMWEIBO_LOGIN_ACTION" type="json">
+			<parameter name="account" value=""></parameter>
+		</request>
+		<response command="CMWEIBO_LOGIN_ACTION" type="json">
+			<parameter name="resultCode" value=""></parameter>
+			<parameter name="errorDescription" value=""></parameter>
+		</response>
+	</protocol>
+	<protocol code="CMWEIBO_SEND_ACTION" name="移动微博发表纯文本" timeout="120">
+		<request command="CMWEIBO_SEND_ACTION" type="json">
+			<parameter name="content" value=""></parameter>
+		</request>
+		<response command="CMWEIBO_SEND_ACTION" type="json">
+			<parameter name="resultCode" value=""></parameter>
+			<parameter name="errorDescription" value=""></parameter>
+		</response>
+	</protocol>
+	<protocol code="CMWEIBO_SEND_IMG_ACTION" name="移动微博发表图片" timeout="120">
+		<request command="CMWEIBO_SEND_IMG_ACTION" type="json">
+			<parameter name="imgName" value=""></parameter>
+		</request>
+		<response command="CMWEIBO_SEND_IMG_ACTION" type="json">
+			<parameter name="resultCode" value=""></parameter>
+			<parameter name="errorDescription" value=""></parameter>
+		</response>
+	</protocol>
+	<protocol code="CMWEIBO_EXIT_ACTION" name="移动微博退出" timeout="120">
+		<request command="CMWEIBO_EXIT_ACTION" type="json"></request>
+		<response command="CMWEIBO_EXIT_ACTION" type="json">
+			<parameter name="resultCode" value=""></parameter>
+			<parameter name="errorDescription" value=""></parameter>
+		</response>
+	</protocol>
+	<protocol code="MAIL163_LOGIN_ACTION" name="163邮箱登陆" timeout="120">
+		<request command="MAIL163_LOGIN_ACTION" type="json">
+			<parameter name="account" value=""></parameter>
+		</request>
+		<response command="MAIL163_LOGIN_ACTION" type="json">
+			<parameter name="resultCode" value=""></parameter>
+			<parameter name="errorDescription" value=""></parameter>
+		</response>
+	</protocol>
+	<protocol code="MAIL163_SEND_ACTION" name="163邮箱发送邮件" timeout="120">
+		<request command="MAIL163_SEND_ACTION" type="json">
+			<parameter name="targetEmail" value=""></parameter>
+			<parameter name="emailContent" value=""></parameter>
+			<parameter name="file" value=""></parameter>
+		</request>
+		<response command="MAIL163_SEND_ACTION" type="json">
+			<parameter name="resultCode" value=""></parameter>
+			<parameter name="errorDescription" value=""></parameter>
+		</response>
+	</protocol>
+	<protocol code="MAIL163_RECEIVE_ACTION" name="163邮箱接收邮件" timeout="120">
+		<request command="MAIL163_RECEIVE_ACTION" type="json">
+			<parameter name="contrastEmailContent" value=""></parameter>
+		</request>
+		<response command="MAIL163_RECEIVE_ACTION" type="json">
+			<parameter name="resultCode" value=""></parameter>
+			<parameter name="errorDescription" value=""></parameter>
+		</response>
+	</protocol>
+	<protocol code="MAIL163_EXIT_ACTION" name="163邮箱退出" timeout="120">
+		<request command="MAIL163_EXIT_ACTION" type="json"></request>
+		<response command="MAIL163_EXIT_ACTION" type="json">
+			<parameter name="resultCode" value=""></parameter>
+			<parameter name="errorDescription" value=""></parameter>
+		</response>
+	</protocol>
+	<protocol code="MAIL139_LOGIN_ACTION" name="139邮箱登陆" timeout="120">
+		<request command="MAIL139_LOGIN_ACTION" type="json">
+			<parameter name="account" value=""></parameter>
+		</request>
+		<response command="MAIL139_LOGIN_ACTION" type="json">
+			<parameter name="resultCode" value=""></parameter>
+			<parameter name="errorDescription" value=""></parameter>
+		</response>
+	</protocol>
+	<protocol code="MAIL139_SEND_ACTION" name="139邮箱发送邮件" timeout="120">
+		<request command="MAIL139_SEND_ACTION" type="json">
+			<parameter name="targetEmail" value=""></parameter>
+			<parameter name="emailContent" value=""></parameter>
+			<parameter name="file" value=""></parameter>
+		</request>
+		<response command="MAIL139_SEND_ACTION" type="json">
+			<parameter name="resultCode" value=""></parameter>
+			<parameter name="errorDescription" value=""></parameter>
+		</response>
+	</protocol>
+	<protocol code="MAIL139_RECEIVE_ACTION" name="139邮箱接收邮件" timeout="120">
+		<request command="MAIL139_RECEIVE_ACTION" type="json">
+			<parameter name="contrastEmailContent" value=""></parameter>
+		</request>
+		<response command="MAIL139_RECEIVE_ACTION" type="json">
+			<parameter name="resultCode" value=""></parameter>
+			<parameter name="errorDescription" value=""></parameter>
+		</response>
+	</protocol>
+	<protocol code="MAIL139_EXIT_ACTION" name="139邮箱退出" timeout="120">
+		<request command="MAIL139_EXIT_ACTION" type="json"></request>
+		<response command="MAIL139_EXIT_ACTION" type="json">
+			<parameter name="resultCode" value=""></parameter>
+			<parameter name="errorDescription" value=""></parameter>
+		</response>
+	</protocol>
+	<protocol code="MM_LOGIN_ACTION" name="移动MM启动" timeout="120">
+		<request command="MM_LOGIN_ACTION" type="json"></request>
+		<response command="MM_LOGIN_ACTION" type="json">
+			<parameter name="resultCode" value=""></parameter>
+			<parameter name="errorDescription" value=""></parameter>
+		</response>
+	</protocol>
+	<protocol code="MM_SEARCH_ACTION" name="移动MM搜索" timeout="120">
+		<request command="MM_SEARCH_ACTION" type="json"></request>
+		<response command="MM_SEARCH_ACTION" type="json">
+			<parameter name="resultCode" value=""></parameter>
+			<parameter name="errorDescription" value=""></parameter>
+		</response>
+	</protocol>
+	<protocol code="MM_DOWNLOAD_ACTION" name="移动MM下载" timeout="600">
+		<request command="MM_DOWNLOAD_ACTION" type="json"></request>
+		<response command="MM_DOWNLOAD_ACTION" type="json">
+			<parameter name="resultCode" value=""></parameter>
+			<parameter name="errorDescription" value=""></parameter>
+		</response>
+	</protocol>
+	<protocol code="MM_LOGOUT_ACTION" name="移动MM退出" timeout="120">
+		<request command="MM_LOGOUT_ACTION" type="json"></request>
+		<response command="MM_LOGOUT_ACTION" type="json">
+			<parameter name="resultCode" value=""></parameter>
+			<parameter name="errorDescription" value=""></parameter>
+		</response>
+	</protocol>
+        <protocol code="HTTP" name="HTTP访问" timeout="120">
+		<request command="HTTP" type="json">
+			<parameter name="url" value=""></parameter>
+		</request>
+		<response command="HTTP" type="json">
+			<parameter name="resultCode" value=""></parameter>
+			<parameter name="errorDescription" value=""></parameter>
+		</response>
+	</protocol>
+        <protocol code="FTP_UP" name="FTP上传" timeout="120">
+		<request command="FTP_UP" type="json">
+			<parameter name="url" value=""></parameter>
+			<parameter name="ftpUserName" value=""></parameter>
+			<parameter name="ftpPassword" value=""></parameter>
+			<parameter name="uploadFile" value=""></parameter>
+		</request>
+		<response command="FTP_UP" type="json">
+			<parameter name="resultCode" value=""></parameter>
+			<parameter name="errorDescription" value=""></parameter>
+		</response>
+	</protocol>
+        <protocol code="FTP_DOWN" name="FTP下载" timeout="120">
+		<request command="FTP_DOWN" type="json">
+			<parameter name="url" value=""></parameter>
+			<parameter name="ftpUserName" value=""></parameter>
+			<parameter name="ftpPassword" value=""></parameter>
+			<parameter name="downloadFile" value=""></parameter>
+		</request>
+		<response command="FTP_DOWN" type="json">
+			<parameter name="resultCode" value=""></parameter>
+			<parameter name="errorDescription" value=""></parameter>
+		</response>
+	</protocol>
+</protocols>

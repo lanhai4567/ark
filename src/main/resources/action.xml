@@ -1,0 +1,243 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TestAction version="1.0">
+	<action code="rtdRelease" name="RTD中断" timeout="90"></action>
+	
+	<action code="rtdUpdate" name="RTD升级" timeout="600">
+		<parameter name="version" value=""/>
+		<parameter name="path" value=""/>
+	</action>
+	<action code="sidUpdate" name="SID升级" timeout="600">
+		<parameter name="version" value=""/>
+		<parameter name="path" value=""/>
+	</action>
+	
+	<action code="rtdLogin" name="RTD登记回复" timeout="90">
+		<parameter name="status" value=""/>
+		<parameter name="systemID" value=""/>
+		<parameter name="systemTime" value=""/>
+		<parameter name="ftpRootDir" value=""/>
+		<parameter name="heartBeatPeriod" value=""/>
+	</action>
+	
+	<action code="rtdHeart" name="RTD心跳回复" timeout="90">
+		<parameter name="systemTime" value=""/>
+	</action>
+	
+	<action code="sidLogin" name="SID登记回复" timeout="90">
+		<parameter name="status" value=""/>
+		<parameter name="systemID" value=""/>
+		<parameter name="systemTime" value=""/>
+		<parameter name="heartBeatPeriod" value=""/>
+	</action>
+	
+	<action code="sidHeart" name="SID心跳回复" timeout="90">
+		<parameter name="systemTime" value=""/>
+	</action>
+	
+	<action code="tempLogin" name="临时登记回复" timeout="90">
+		<parameter name="status" value=""/>
+		<parameter name="systemTime" value=""/>
+	</action>
+	
+	<action code="pesqLogin" name="pesq登记回复" timeout="90">
+		<parameter name="status" value=""/>
+		<parameter name="systemID" value=""/>
+		<parameter name="systemTime" value=""/>
+		<parameter name="ftpRootDir" value=""/>
+		<parameter name="heartBeatPeriod" value=""/>
+	</action>
+	
+	<action code="pesqHeart" name="pesq心跳回复" timeout="90">
+		<parameter name="systemTime" value=""/>
+	</action>
+	
+	<action code="pesq" name="PESQ语音评定" timeout="90">
+		<parameter name="sequence" value=""/>
+		<parameter name="voiceFile" value=""/>
+		<parameter name="recordFile" value=""/>
+	</action>
+	
+	<action code="powerOn" name="模块加电" timeout="120">
+		<parameter name="userType" value="0"/>
+		<parameter name="cardType" value="1"/>
+		<parameter name="sidId" value=""/>
+		<parameter name="sidSlot" value=""/>
+		<parameter name="msisdn" value=""/>
+	</action>
+	<action code="powerOff" name="模块断电" timeout="90"></action>
+	
+	<action code="checkRegister" name="检测网络登记" timeout="90">
+		<parameter name="operators" value="CMCC"/>
+		<parameter name="timeout" value="70"/>
+	</action>
+	<action code="register" name="登记网络" timeout="150">
+		<parameter name="operators" value="CMCC"/>
+		<parameter name="timeout" value="120"/>
+	</action>
+	<action code="unregister" name="注销网络" timeout="90"></action>
+	
+	<action code="pppDial" name="PPP拨号" timeout="200">
+		<parameter name="apnName" value="CMNET"/>
+		<parameter name="apnUser" value=""/>
+		<parameter name="apnPassword" value=""/>
+	</action>
+	<action code="pppTerm" name="断开PPP拨号" timeout="90"></action>
+	
+	<action code="http" name="HTTP访问" timeout="200">
+		<parameter name="url" value="www.baidu.com"/>
+		<parameter name="timeout" value="180"/>
+	</action>
+	
+	<action code="attach" name="ATTACH附着" timeout="180"></action>
+	
+	<action code="setBusy" name="设置忙碌" timeout="90">
+		<parameter name="waitTime" value="60"/>
+	</action>
+	
+	<action code="sendDTMF" name="发送DTMF" timeout="120">
+		<parameter name="dtmfSequence" value=""></parameter>
+	</action>
+	
+	<action code="setCallForward" name="设置呼叫转移" timeout="90">
+		<parameter name="forwardType" value=""></parameter>
+		<parameter name="forwardNumber" value="0"></parameter>
+	</action>
+	<action code="cancelCallForward" name="取消呼叫转移" timeout="90"></action>
+	
+	<action code="voiceCall" name="语音呼叫" timeout="120">
+		<parameter name="calledNumber" value="10086"></parameter>
+		<parameter name="recordLength" value="0"></parameter>
+	</action>
+	<action code="waitVoiceCallin" name="等待语音呼入" timeout="120">
+		<parameter name="callNumber" value=""></parameter>
+		<parameter name="timeout" value="90"></parameter>
+	</action>
+	<action code="voiceCallAnswer" name="语音接听" timeout="120">
+		<parameter name="waitTime" value="10"></parameter>
+	</action>
+	<action code="voiceRP" name="录播音" timeout="120">
+		<parameter name="voiceRPType" value="2"></parameter>
+		<parameter name="voiceFile" value="_Resource/test.wav"></parameter>
+		<parameter name="voiceLength" value="10"></parameter>
+	</action>
+	<action code="hangupVoiceCall" name="语音挂机" timeout="90">
+		<parameter name="waitTime" value=""></parameter>
+	</action>
+	
+	<action code="sendSMS" name="发送短信" timeout="90">
+		<parameter name="calledNumber" value="10086"></parameter>
+		<parameter name="smsContent" value="Hi,My Name is kernel！"></parameter>
+		<parameter name="reportTimeout" value="0"></parameter>
+	</action>
+	<action code="receiveSMS" name="接收短信" timeout="320">
+		<parameter name="callNumber" value=""></parameter>
+		<parameter name="verifyContent" value=""></parameter>
+		<parameter name="receiveCount" value="1"></parameter>
+		<parameter name="receiveTimeout" value="300"></parameter>
+	</action>
+	<action code="sendMMS" name="发送彩信" timeout="300">
+		<parameter name="calledNumber" value=""></parameter>
+		<parameter name="gatewayIp" value=""></parameter>
+		<parameter name="gatewayPort" value=""></parameter>
+		<parameter name="protocol" value=""></parameter>
+		<parameter name="mmsTitle" value=""></parameter>
+		<parameter name="mmsFile" value=""></parameter>
+		<parameter name="mmsContent" value=""></parameter>
+	</action>
+	<action code="receivePush" name="接收push短信" timeout="320">
+		<parameter name="callNumber" value=""></parameter>
+		<parameter name="receiveTimeout" value="300"></parameter>
+	</action>
+	<action code="getMMS" name="提取彩信" timeout="300">
+		<parameter name="callNumber" value=""></parameter>
+		<parameter name="gatewayIp" value=""></parameter>
+		<parameter name="gatewayPort" value=""></parameter>
+		<parameter name="protocol" value=""></parameter>
+		<parameter name="pushUrl" value=""></parameter>
+	</action>
+	
+	<action code="sendMail" name="发送邮件" timeout="90">
+		<parameter name="loginUser" value=""/>
+        <parameter name="loginPassword" value=""/>
+        <parameter name="toMailUser" value=""/>
+        <parameter name="host" value=""/>
+        <parameter name="mailTitle" value=""/>
+        <parameter name="mailContent" value=""/>
+	</action>
+	<action code="receiveMail" name="接收邮件" timeout="90">
+		<parameter name="loginUser" value=""/>
+        <parameter name="loginPassword" value=""/>
+        <parameter name="fromMailUser" value=""/>
+        <parameter name="host" value=""/>
+        <parameter name="timeout" value="60"/>
+	</action>
+	
+	<action code="pdp" name="PDP激活" timeout="30">
+		<parameter name="appName" value=""></parameter>
+		<parameter name="appUser" value=""></parameter>
+		<parameter name="appPassword" value=""></parameter>
+	</action>
+	
+	<action code="ping" name="PING" timeout="120">
+		<parameter name="url" value="www.baidu.com"></parameter>
+		<parameter name="packetSize" value="32"></parameter>
+		<parameter name="pingCount" value="3"></parameter>
+	</action>
+	
+	<action code="telnet" name="TELENT" timeout="90">
+		<parameter name="url" value=""></parameter>
+		<parameter name="telnetPort" value=""></parameter>
+	</action>
+	
+	<action code="trace" name="trace" timeout="180">
+		<parameter name="url" value=""></parameter>
+	</action>
+	
+	<action code="mring" name="彩铃识别" timeout="90">
+		<parameter name="recordFile" value=""></parameter>
+	</action>
+	
+	<action code="wap" name="WAP访问" timeout="300">
+		<parameter name="gatewayIp" value="10.0.0.172"></parameter>
+		<parameter name="gatewayPort" value="80"></parameter>
+		<parameter name="protocol" value="wap2.0"></parameter>
+		<parameter name="url" value=""></parameter>
+		<parameter name="timeout" value="120"></parameter>
+	</action>
+	
+	<action code="ftpUp" name="FTP上传" timeout="150">
+		<parameter name="url" value=""></parameter>
+		<parameter name="ftpUserName" value=""></parameter>
+		<parameter name="ftpPassword" value=""></parameter>
+		<parameter name="uploadFile" value=""></parameter>
+		<parameter name="timeout" value="120"></parameter>
+	</action>
+	<action code="ftpDown" name="FTP下载" timeout="150">
+		<parameter name="url" value=""></parameter>
+		<parameter name="ftpUserName" value=""></parameter>
+		<parameter name="ftpPassword" value=""></parameter>
+		<parameter name="downloadFile" value=""></parameter>
+		<parameter name="timeout" value="120"></parameter>
+	</action>
+	
+	<action code="videoCall" name="视频呼叫" timeout="120">
+		<parameter name="calledNumber" value="10086"></parameter>
+		<parameter name="recordLength" value="0"></parameter>
+	</action>
+	<action code="waitVideoCallin" name="等待视频呼入" timeout="120">
+		<parameter name="callNumber" value=""></parameter>
+		<parameter name="timeout" value="90"></parameter>
+	</action>
+	<action code="videoCallAnswer" name="视频接听" timeout="120">
+		<parameter name="waitTime" value="10"></parameter>
+	</action>
+	<action code="videoRP" name="录播视频" timeout="120">
+		<parameter name="videoRPType" value="2"></parameter>
+		<parameter name="voiceFile" value="_Resource/test.wav"></parameter>
+		<parameter name="videoFile" value="_Resource/test.wav"></parameter>
+		<parameter name="videoLength" value="10"></parameter>
+	</action>
+	<action code="hangupVideoCall" name="语音挂机" timeout="90">
+		<parameter name="waitTime" value=""></parameter>
+	</action>
+</TestAction>

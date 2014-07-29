@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<task version="1.0" id="checkBalance" name="余额查询">
+
+	<start id="start">
+		<transition to="A_checkRegister" name="检测网络登记" />
+	</start>
+	
+	<node id="A_checkRegister" name="检测网络登记" resourcePrefix="resourceA_"  actionType="checkRegister">
+        <param name="msisdn" value="${resourceA_.testNum}"/>
+        <transition to="A_powerOn" expression=" ${A_checkRegister.status != 0}" name="未登记网络，需要加电" />
+        <transition to="A_sendSMS" expression="${A_checkRegister.status == 0}" name="已登记网络" />
+        <transition to="end" name="检测登记网络失败" />
+    </node>
+	
+	<node id="A_powerOn" name="模块加电" resourcePrefix="resourceA_"  actionType="powerOn">
+		<param name="cardType" value="${resourceA_.cardType}"/>
+    	<param name="sidId" value="${resourceA_.sidSerialNum}"/>
+     	<param name="sidSlot" value="${resourceA_.sidSlotNum}"/>
+     	<param name="msisdn" value="${resourceA_.testNum}"/>
+		<transition to="A_register" expression=" ${A_powerOn.resultCode == 'SUCCESS'}" name="加电成功" />
+		<transition to="end" expression="${A_powerOn.resultCode != 'SUCCESS'}" name="加电失败" />
+	</node>
+	
+	<node id="A_register" name="登记网络" resourcePrefix="resourceA_"  actionType="register">
+		<param name="netType" value="${resourceA_.netType}"/>
+		<transition to="A_sendSMS" expression="${A_register.resultCode == 'SUCCESS'}" name="登记成功" />
+		<transition to="A_powerOff" expression="${A_register.resultCode != 'SUCCESS'}" name="登记失败" />
+	</node>
+
+	<!-- 业务开始 -->
+	<node id="A_sendSMS" name="发送短信" resourcePrefix="resourceA_" actionType="sendSMS">
+        <param name="calledNumber" value="${spCalledNumber}"/>
+        <param name="smsContent" value="${smsContent}"/>
+        <transition to="A_receiveSMS" expression="${A_sendSMS.resultCode == 'SUCCESS'}" name="发送短信成功"></transition>
+		<transition to="A_unregister" expression="${this.resourceA_close == true}"  name="需要注销网络"/>
+ 		<transition to="end" name="不需要注销网络"/>
+	</node>
+	
+	<node id="A_receiveSMS" name="接收短信" resourcePrefix="resourceA_" actionType="receiveSMS">
+        <param name="callNumber" value="${spCalledNumber}"/>
+        <param name="verifyContent" value="${verifyContent}"/>
+        <param name="receiveTimeout" value="${receiveTimeout}"/>
+		<transition to="A_unregister" expression="${this.resourceA_close == true}"  name="需要注销网络"/>
+ 		<transition to="end" name="不需要注销网络"/>
+ 	</node>
+	
+	<!-- 业务结束 -->
+	<node id="A_unregister" name="注销网络" resourcePrefix="resourceA_"  actionType="unregister">
+		<transition to="A_powerOff" />
+	</node>
+
+	<node id="A_powerOff" name="模块断电" resourcePrefix="resourceA_"  actionType="powerOff">
+		<transition to="end" />
+	</node>
+	
+	<end id="end" name="流程结束" />
+
+	<result>
+		<variable code="resultCode" name="结果码" value="${resultCode}" javaType="String"  description=""/>
+		<variable code="errorDescription" name="错误描述" value="${errorDescription}"  javaType="String"  description=""/>
+		<variable code="sendTime" name="发送开始时间" value="${A_sendSMS.sendTime}" javaType="Date" description="发送短信动作"/>
+		<variable code="sendedTime" name="发送完成时间"  value="${A_sendSMS.sendedTime}" javaType="Date"  description="发送短信动作"/>
+		<variable code="reportTime" name="状态报告时间" value="${A_sendSMS.reportTime}"  javaType="Date" description="发送短信动作"/>
+		<variable code="receiveCount" name="接收短信条数"  value="${A_receiveSMS.receiveCount}" javaType="Integer"  description="接收短信动作"/>
+		<variable code="smsContent" name="接收的短信内容" value="${A_receiveSMS.smsContent}"  javaType="String" description="接收短信动作"/>
+		<variable code="sendLatency" name="短信发送时延" value="${interval(A_sendSMS.sendedTime,A_sendSMS.sendTime)}"  javaType="Float" description="公式：发送完成时间-发送开始时间"/>
+	</result>
+</task>

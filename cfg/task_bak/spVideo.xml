@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<task version="1.0" id="spVideo" name="sp视频">
+	
+	<start id="start">
+		<transition to="A_checkRegister" name="检测网络登记" />
+	</start>
+	
+	 <node id="A_checkRegister" name="检测网络登记" resourcePrefix="resourceA_"  actionType="checkRegister">
+        <param name="msisdn" value="${resourceA_.testNum}"/>
+        <transition to="A_powerOn" expression=" ${A_checkRegister.status != 0}" name="未登记网络，需要加电" />
+        <transition to="A_videoCall" expression="${A_checkRegister.status == 0}" name="已登记网络" />
+    </node>
+	
+	<node id="A_powerOn" name="模块加电" resourcePrefix="resourceA_"  actionType="powerOn">
+		<param name="cardType" value="${resourceA_.cardType}"/>
+    	<param name="sidId" value="${resourceA_.sidSerialNum}"/>
+     	<param name="sidSlot" value="${resourceA_.sidSlotNum}"/>
+     	<param name="msisdn" value="${resourceA_.testNum}"/>
+		<transition to="A_register" expression=" ${A_powerOn.resultCode == 'SUCCESS'}" name="加电成功" />
+		<transition to="end" expression="${A_powerOn.resultCode != 'SUCCESS'}" name="加电失败" />
+	</node>
+	
+	<node id="A_register" name="登记网络" resourcePrefix="resourceA_"  actionType="register">
+		<param name="netType" value="${resourceA_.netType}"/>
+		<transition to="A_videoCall" expression="${A_register.resultCode == 'SUCCESS'}" name="登记成功" />
+		<transition to="A_powerOff" expression="${A_register.resultCode != 'SUCCESS'}" name="登记失败" />
+	</node>
+
+	<!-- 视频呼叫号码 -->
+	<node id="A_videoCall" name="sp视频呼叫" resourcePrefix="resourceA_" actionType="videoCall">
+		<param name="calledNumber" value="${spNumber}"/>
+		<transition to="A_videoRP" expression="${A_videoCall.resultCode == 'SUCCESS'}"	name="sp视频呼叫成功"/>
+		<transition to="A_hangupVideoCall" expression="${A_videoCall.resultCode != 'SUCCESS'}"  name="sp视频呼叫失败"/>
+	</node>
+
+	<node id="A_videoRP" name="录播视频" resourcePrefix="resourceA_" actionType="videoRP">
+        <param name="videoLength" value="${duration}"/>
+        <param name="videoRPType" value="${videoRPType}" />
+		<param name="voiceFile" value="${voiceFile}" />
+		<param name="videoFile" value="${videoFile}" />
+		<transition to="A_hangupVideoCall" name="成功或失败"/>
+	</node>
+	
+	<node id="A_hangupVideoCall" name="视频挂机" resourcePrefix="resourceA_" actionType="hangupVideoCall">
+		<transition to="A_unregister" expression="${resourceA_close == true}"  name="需注销网络"/>
+		<transition to="end"/>
+	</node>
+	
+	<!-- 业务结束 -->
+	<node id="A_unregister" name="注销网络" resourcePrefix="resourceA_"  actionType="unregister">
+		<transition to="A_powerOff" />
+	</node>
+
+	<node id="A_powerOff" name="模块断电" resourcePrefix="resourceA_"  actionType="powerOff">
+		<transition to="end" />
+	</node>
+	
+	<end id="end" name="流程结束" />
+
+	<result>
+		<variable code="resultCode" name="结果码" value="${resultCode}"  javaType="String"  description=""/>
+		<variable code="errorDescription" name="错误描述" value="${errorDescription}"  javaType="String"  description=""/>
+		<variable code="callTime" name="拨号时间" value="${A_videoCall.callTime}"  javaType="Date" description="视频呼入动作"/>
+		<variable code="ringTime" name="振铃时间"  value="${A_videoCall.callRingTime}"  javaType="Date"  description="视频呼入动作"/>
+		<variable code="answerTime" name="接听时间" value="${A_videoCall.callAnswerTime}"   javaType="Date" description="视频呼入动作"/>
+		<variable code="hangupTime" name="挂断时间" value="${A_hangupVideoCall.hangupTime}"   javaType="Date" description="视频挂机"/>
+		<variable code="voiceRecordFile" name="语音录音文件" value="${A_videoRP.voiceRecordFile}"   javaType="String" description="录播视频动作"/>
+		<variable code="videoRecordFile" name="视频录制文件" value="${A_videoRP.videoRecordFile}"   javaType="String" description="录播视频动作"/>
+	</result>
+</task>

@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<task version="1.0" id="qq" name="QQ互相通讯业务">
+
+	<start id="start">
+		<transition to="A_androidOpen" name="资源初始化" />
+	</start>
+
+	<node id="A_androidOpen" name="A资源开机" resourcePrefix="resourceA_"  actionType="androidOpen">
+		<param name="sidId" value="${resourceA_.sidSerialNum}"/>
+	 	<param name="sidSlot" value="${resourceA_.sidSlotNum}"/>
+	 	<param name="accountName" value="${accountA[0].name}"/>
+	 	<param name="netType" value="${resourceA_.netType}"/>
+	 	<param name="accountType" value="${taskType}"/>
+        <transition to="A_login" expression="${A_androidOpen.resultCode == 'SUCCESS'}" name="开机成功" />
+		<transition to="A_interrupt" expression="${A_androidOpen.resultCode != 'SUCCESS'}" name="开机失败，中断" />
+    </node>
+    
+    <node id="A_login" name="A资源QQ登陆" resourcePrefix="resourceA_"  actionType="QQ_LOGIN_ACTION">
+    	<param name="account" value="${accountA[0]}"/>
+		<transition to="A_QQExit" expression="${A_login.resultCode == 'SUCCESS'}" name="登陆成功" />
+		<transition to="A_interrupt"  name="登陆失败" />
+	</node>
+
+	<node id="A_QQExit" name="A资源QQ退出" resourcePrefix="resourceA_" actionType="QQ_EXIT_ACTION">
+		<transition to="A_androidClose" expression="${A_QQExit.resultCode == 'SUCCESS'}" name="QQ退出成功" />
+		<transition to="A_interrupt" />
+	</node>
+	
+	<node id="A_androidClose" name="A资源释放" resourcePrefix="resourceA_" actionType="androidClose">
+		<transition to="A_interrupt" />
+	</node>
+	
+	<!-- 资源中断 -->
+
+	<node id="A_interrupt" name="A资源中断" resourcePrefix="resourceA_" actionType="rtdRelease">
+		<transition to="end" />
+	</node>
+
+	<end id="end" />
+	
+	<result>
+		<variable code="resultCode" name="结果码" value="${resultCode}"  javaType="String"  description=""/>
+		<variable code="errorDescription" name="错误描述" value="${errorDescription}"  javaType="String"  description=""/>
+		<variable code="loginDelay" name="登陆时长" value="${interval(A_login.loginEndTime,A_login.loginRequestTime)}"  javaType="Float"  description="公式：登陆完成时间点-登陆请求时间点"/>
+	</result>
+</task>

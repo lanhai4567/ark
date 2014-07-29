@@ -1,0 +1,45 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<task version="1.0" id="ftpDown" name="ftp下载测试业务">
+
+	<start id="start">
+		<transition to="A_androidOpen" name="资源开机" />
+	</start>
+	
+	 <node id="A_androidOpen" name="资源开机" resourcePrefix="resourceA_"  actionType="androidOpen">
+        <param name="sidId" value="${resourceA_.sidSerialNum}"/>
+	 	<param name="sidSlot" value="${resourceA_.sidSlotNum}"/>
+	 	<param name="accountName" value="${accountA[0].name}"/>
+	 	<param name="accountType" value="${taskType}"/>
+	 	<param name="netType" value="${resourceA_.netType}"/>
+        <transition to="A_ftpDown" expression="${A_androidOpen.resultCode == 'SUCCESS'}" name="开机成功" />
+        <transition to="A_interrupt" expression="${A_androidOpen.resultCode != 'SUCCESS'}" name="开机失败，中断" />
+    </node>
+	
+	<node id="A_ftpDown" name="FTP下载" resourcePrefix="resourceA_"  actionType="FTP_DOWN">
+		<param name="url" value="${url}"/>
+		<param name="ftpUserName" value="${ftpUserName}"/>
+		<param name="ftpPassword" value="${ftpPassword}"/>
+		<param name="downloadFile" value="${downloadFile}"/>
+		<transition to="A_androidClose" name="释放资源" />
+	</node>
+	
+	<node id="A_androidClose" name="释放资源" resourcePrefix="resourceA_" actionType="androidClose">
+		<transition to="end" />
+	</node>
+
+	<node id="A_interrupt" name="资源中断" resourcePrefix="resourceA_" actionType="rtdRelease">
+		<transition to="end" />
+	</node>
+	
+	<end id="end" />
+	
+	<result>
+		<variable code="resultCode" name="结果码" value="${resultCode}"  javaType="String"  description=""/>
+		<variable code="errorDescription" name="错误描述" value="${errorDescription}"  javaType="String"  description=""/>
+		<variable code="downloadTime" name="下载开始时间" value="${A_ftpDown.downloadTime}"  javaType="String"  description=""/>
+		<variable code="downloadedTime" name="下载结束时间" value="${A_ftpDown.downloadedTime}"  javaType="String"  description=""/>
+		<!-- 根据项目需要，在JS中进行了单位转换 -->
+		<variable code="downloadSize" name="下载大小，单位KB" value="${divide(A_ftpDown.downloadSize,1024)}"  javaType="Integer"  description=""/>
+		<variable code="downloadRate" name="下载速率，单位KB/s" value="${divide(divide(A_ftpDown.downloadSize,1024),interval(A_ftpDown.downloadedTime,A_ftpDown.downloadTime))}"  javaType="Integer"  description=""/>
+	</result>
+</task>

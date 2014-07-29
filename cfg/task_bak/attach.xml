@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<task version="1.0" id="attach" name="ATTACH操作">
+	
+	<start id="start">
+		<transition to="A_checkRegister" name="检测网络登记" />
+	</start>
+	
+	 <node id="A_checkRegister" name="检测网络登记" resourcePrefix="resourceA_"  actionType="checkRegister">
+        <param name="msisdn" value="${resourceA_.testNum}"/>
+        <transition to="A_powerOn" expression=" ${A_checkRegister.status != 0}" name="未登记网络，需要加电" />
+        <transition to="A_attach" expression="${A_checkRegister.status == 0}" name="已登记网络" />
+    </node>
+	
+	<node id="A_powerOn" name="模块加电" resourcePrefix="resourceA_"  actionType="powerOn">
+		<param name="cardType" value="${resourceA_.cardType}"/>
+    	<param name="sidId" value="${resourceA_.sidSerialNum}"/>
+     	<param name="sidSlot" value="${resourceA_.sidSlotNum}"/>
+     	<param name="msisdn" value="${resourceA_.testNum}"/>
+		<transition to="A_register" expression=" ${A_powerOn.resultCode == 'SUCCESS'}" name="加电成功" />
+		<transition to="end" expression="${A_powerOn.resultCode != 'SUCCESS'}" name="加电失败" />
+	</node>
+	
+	<node id="A_register" name="登记网络" resourcePrefix="resourceA_"  actionType="register">
+		<param name="netType" value="${resourceA_.netType}"/>
+		<transition to="A_attach" expression="${A_register.resultCode == 'SUCCESS'}" name="登记成功" />
+		<transition to="A_powerOff" expression="${A_register.resultCode != 'SUCCESS'}" name="登记失败" />
+	</node>
+	
+	<node id="A_attach" name="ATTACH操作" resourcePrefix="resourceA_"  actionType="attach">
+		<transition to="A_unregister" expression="${this.resourceA_close == true}"  />
+		<transition to="end" />
+	</node>
+
+	<node id="A_unregister" name="注销网络" resourcePrefix="resourceA_"  actionType="unregister">
+		<transition to="A_powerOff" />
+	</node>
+
+	<node id="A_powerOff" name="模块断电" resourcePrefix="resourceA_"  actionType="powerOff">
+		<transition to="end" />
+	</node>
+	
+	<end id="end" name="流程结束" />
+	
+	<result>
+		<variable code="resultCode" name="结果码" value="${resultCode}"  javaType="String"  description=""/>
+		<variable code="errorDescription" name="错误描述" value="${errorDescription}"  javaType="String"  description=""/>
+		<variable code="attachTime" name="ATTACH开始时间" value="${A_attach.attachTime}"  javaType="DateTime" description=""/>
+		<variable code="attachedTime" name="ATTACH结束时间"  value="${A_attach.attachedTime}"  javaType="DateTime"  description=""/>
+		<variable code="attachLatency" name="ATTACH时延" value="${interval(A_attach.attachedTime,A_attach.attachTime)}"   javaType="Float" description="公式：Attach结束时间 - Attach开始时间"/>
+	</result>
+
+</task>

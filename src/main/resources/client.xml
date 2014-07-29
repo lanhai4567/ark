@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+	   "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap>
+	
+	<!-- clientInfo -->
+	<typeAlias alias="clientInfo" type="com.etone.ark.kernel.http.ClientInfo" />
+	
+	<resultMap id="clientResult" class="clientInfo">
+	  <result property="token" column="token" />
+	  <result property="name" column="name" />
+ 	</resultMap>
+ 	
+	<statement id="createClientTable">
+		CREATE TABLE IF NOT EXISTS clientInfo(
+			token	VARCHAR(50)		PRIMARY KEY,
+			name	VARCHAR(20)
+		)
+	</statement>
+	
+	<insert id="insertClient" parameterClass="clientInfo">
+		INSERT INTO clientInfo(token,name) VALUES(#token#,#name#)
+	</insert>
+	
+	<update id="updateClient" parameterClass="clientInfo">
+		UPDATE clientInfo SET
+			name=#name#
+		WHERE token=#token#
+	</update>
+	
+	<delete id="deleteClientByToken" parameterClass="string">
+		DELETE FROM clientInfo WHERE token=#token#
+	</delete>
+	
+	<select id="getClientByToken" parameterClass="string" resultClass="clientInfo">
+		SELECT token,name FROM clientInfo WHERE token=#token#
+	</select>
+	
+	<select id="selectAllClient"  resultClass="clientInfo">
+		SELECT token,name FROM clientInfo
+	</select>
+	
+	<!-- ClientEventInfo -->
+	<typeAlias alias="clientEventInfo" type="com.etone.ark.kernel.http.ClientEventInfo"/>
+	
+	<resultMap id="clientEventResult" class="clientEventInfo">
+	  <result property="token" column="token" />
+	  <result property="name" column="name" />
+	  <result property="callback" column="callback" />
+	  <result property="param" column="param" />
+ 	</resultMap>
+ 	
+ 	<statement id="createClientEventTable">
+		CREATE TABLE IF NOT EXISTS clientEventInfo(
+			token    VARCHAR(50),
+			name	 VARCHAR(20),
+			callback VARCHAR(200),
+			param	VARCHAR(20)
+		)
+	</statement>
+	
+	<insert id="insertClientEvent" parameterClass="clientEventInfo">
+		INSERT INTO clientEventInfo(token,name,callback,param) VALUES(#token#,#name#,#callback#,#param#)
+	</insert>
+	
+	<update id="updateClientEvent" parameterClass="clientEventInfo">
+		UPDATE clientEventInfo SET
+			name=#name#,
+			callback=#callback#,
+			param=#param#
+		WHERE token=#token#
+	</update>
+	
+	<delete id="deleteClientEventByToken" parameterClass="string">
+		DELETE FROM clientEventInfo WHERE token=#token#
+	</delete>
+	
+	<delete id="deleteClientEventByTokenAndName" parameterClass="clientEventInfo">
+		DELETE FROM clientEventInfo WHERE token=#token# AND name=#name#
+	</delete>
+	
+	<select id="getByTokenAndName" parameterClass="clientEventInfo" resultClass="clientEventInfo">
+		SELECT token,name,callback,param FROM clientEventInfo WHERE token=#token# AND name=#name#
+	</select>
+	
+	<select id="selectClientEventByToken" parameterClass="string" resultClass="clientEventInfo">
+		SELECT token,name,callback,param FROM clientEventInfo WHERE token=#token#
+	</select>
+	
+</sqlMap>

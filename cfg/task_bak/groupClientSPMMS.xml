@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<task version="1.0" id="groupClientSPMMS" name="集团客户SP彩信">
+	
+	<start id="start">
+		<transition to="A_checkRegister" name="检测网络登记" />
+	</start>
+	
+	 <node id="A_checkRegister" name="检测网络登记" resourcePrefix="resourceA_"  actionType="checkRegister">
+        <param name="msisdn" value="${resourceA_.testNum}"/>
+        <transition to="A_powerOn" expression=" ${A_checkRegister.status != 0}" name="未登记网络，需要加电" />
+        <transition to="A_pppDial" expression="${A_checkRegister.status == 0}" name="已登记网络" />
+        <transition to="end" name="检测登记网络失败" />
+    </node>
+	
+	<node id="A_powerOn" name="模块加电" resourcePrefix="resourceA_"  actionType="powerOn">
+	 	<param name="cardType" value="${resourceA_.cardType}"/>
+    	<param name="sidId" value="${resourceA_.sidSerialNum}"/>
+     	<param name="sidSlot" value="${resourceA_.sidSlotNum}"/>
+     	<param name="msisdn" value="${resourceA_.testNum}"/>
+		<transition to="A_register" expression=" ${A_powerOn.resultCode == 'SUCCESS'}" name="加电成功" />
+		<transition to="end" expression="${A_powerOn.resultCode != 'SUCCESS'}" name="加电失败" />
+	</node>
+	
+	<node id="A_register" name="登记网络" resourcePrefix="resourceA_"  actionType="register">
+		<param name="netType" value="${resourceA_.netType}"/>
+		<transition to="A_sendSMS" expression="${A_register.resultCode == 'SUCCESS'}" name="登记成功" />
+		<transition to="A_powerOff" expression="${A_register.resultCode != 'SUCCESS'}" name="登记失败" />
+	</node>
+	
+	<!-- 业务逻辑 -->
+	
+	<node id="A_sendSMS" name="发送短信" resourcePrefix="resourceA_" actionType="sendSMS">
+		<param name="calledNumber" value="${spCalledNumber}"/>
+        <param name="smsContent" value="${smsContent}"/>
+        <param name="reportTimeout" value="${reportTimeout}"/>
+		<transition to="A_receivePush" name="成功或失败"/>
+		<transition to="A_unregister" expression="${this.resourceA_close == true}" name="发送短信失败，需要注销网络" />
+        <transition to="end" name="发送短信失败，不注销网络"/>
+	</node>
+	
+	<node id="A_receivePush" name="接收push彩信" resourcePrefix="resourceA_" actionType="receivePush">
+        <param name="callNumber" value="${spCalledNumber}"/>
+		<transition to="A_pppDial" name="成功"/>
+		<transition to="A_unregister" expression="${this.resourceA_close == true}" name="接收push彩信失败，需要注销网络" />
+        <transition to="end" name="接收push彩信失败，不注销网络"/>
+	</node>
+
+    <node id="A_pppDial" name="PPP拨号" resourcePrefix="resourceA_"  actionType="pppDial">
+        <param name="apnName" value="${apnName}"/>
+        <param name="apnUser" value="${apnUser}"/>
+        <param name="apnPassword" value="${apnPassword}"/>
+        <transition to="A_getMMS" expression=" ${A_pppDial.resultCode == 'SUCCESS'}" name="PPP拨号成功" />
+        <transition to="A_unregister" expression="${this.resourceA_close == true}" name="PPP拨号失败，需要注销网络" />
+        <transition to="end" name="PPP拨号失败，不注销网络"/>
+    </node>
+	
+	<node id="A_getMMS" name="提取彩信" resourcePrefix="resourceA_" actionType="getMMS">
+        <param name="pushUrl" value="${A_receivePush.pushUrl}"/>
+        <param name="protocol" value="${protocol}"/>
+        <param name="gatewayIp" value="${gatewayIp}"/>
+        <param name="gatewayPort" value="${gatewayPort}"/>
+		<transition to="A_pppTerm" name="成功或失败"/>
+	</node>
+
+	<node id="A_pppTerm" name="断开PPP拨号" resourcePrefix="resourceA_"  actionType="pppTerm">
+        <transition to="A_unregister" expression="${this.resourceA_close == true}"  />
+        <transition to="end" />
+    </node>
+
+	<node id="A_unregister" name="注销网络" resourcePrefix="resourceA_"  actionType="unregister">
+		<transition to="A_powerOff" />
+	</node>
+
+	<node id="A_powerOff" name="模块断电" resourcePrefix="resourceA_"  actionType="powerOff">
+		<transition to="end" />
+	</node>
+	
+	<end id="end" name="流程结束" />
+
+	<result>
+		<variable code="resultCode" name="结果码" value="${resultCode}"  javaType="String"  description=""/>
+		<variable code="errorDescription" name="错误描述" value="${errorDescription}"  javaType="String"  description=""/>
+		<variable code="sendTime" name="短信发送开始时间" value="${A_sendSMS.sendTime}"  javaType="Date" description="发送短信动作"/>
+		<variable code="sendedTime" name="短信发送结束时间"  value="${A_sendSMS.sendedTime}"  javaType="Date"  description="发送短信动作"/>
+		<variable code="pushTime" name="push下发时间" value="${A_receivePush.pushTime}"   javaType="Date" description="接收push彩信动作"/>
+		<variable code="pushUrl" name="彩信提取地址" value="${A_receivePush.pushUrl}"   javaType="String" description="接收push彩信动作"/>
+		<variable code="getTime" name="提取开始时间" value="${A_getMMS.getTime}"   javaType="Date" description="提取彩信动作"/>
+		<variable code="getedTime" name="提取完成时间" value="${A_getMMS.getedTime}"   javaType="Date" description="提取彩信动作"/>
+		<variable code="mmsTitle" name="彩信标题" value="${A_getMMS.mmsTitle}"   javaType="String" description="提取彩信动作"/>
+		<variable code="mmsFile" name="彩信文件路径" value="${A_getMMS.mmsFile}"  javaType="String"  description="提取彩信动作"/>
+	</result>
+</task>

@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<coummunication>
+	<!-- 微内核配置 -->
+	<socketService id="jsonDevice" name="设备通信服务" port="${socketJsonMessagePort}" type="json" linkHandle="com.etone.ark.kernel.socket.SocketStatusHandler">
+		<listen>com.etone.ark.communication.socket.SocketJsonMessageHeaderListener</listen>
+		<listen>com.etone.ark.kernel.socket.JsonRtdNetMessageHandler</listen>
+		<listen>com.etone.ark.kernel.socket.JsonRtdHeartMessageHandler</listen>
+		<listen>com.etone.ark.kernel.socket.JsonAndroidHeartMessageHandler</listen>
+		<listen>com.etone.ark.kernel.socket.JsonSidHeartMessageHandler</listen>
+		<listen>com.etone.ark.kernel.socket.JsonTempLoginMessageHandler</listen>
+		<listen>com.etone.ark.kernel.socket.JsonAndroidLoginMessageHandler</listen>
+		<listen>com.etone.ark.kernel.socket.JsonRtdLoginMessageHandler</listen>
+		<listen>com.etone.ark.kernel.socket.JsonSidLoginMessageHandler</listen>
+		<listen>com.etone.ark.kernel.socket.JsonActionResponseMessageHandler</listen>
+		<listen>com.etone.ark.kernel.socket.JsonRelayMessageHandler</listen>
+	</socketService>
+	
+	<socketService id="byteDevice" name="Byte协议设备" port="${socketByteMessagePort}" type="byte" linkHandle="com.etone.ark.kernel.socket.SocketStatusHandler">
+		<listen>com.etone.ark.communication.socket.SocketByteMessageHeaderListener</listen>
+		<listen>com.etone.ark.kernel.socket.ByteRtdLoginMessageHandler</listen>
+		<listen>com.etone.ark.kernel.socket.ByteRtdHeartMessageHandler</listen>
+		<listen>com.etone.ark.kernel.socket.ByteRtdReleaseMessageHandler</listen>
+		<listen>com.etone.ark.kernel.socket.ByteSyncMessageHandler</listen>
+		<listen>com.etone.ark.communication.socket.SocketByteMessageActionHeaderListener</listen>
+		<listen>com.etone.ark.kernel.socket.ByteActionResponseMessageHandler</listen>
+		<listen>com.etone.ark.kernel.socket.ByteRelayMessageHandler</listen>
+	</socketService>
+	
+	<socketClient id="communication" name="通讯中心" ip="${remoteIp}" port="${remotePort}" type="byte" linkHandle="com.etone.ark.kernel.remote.RemoteCityLinkHandler">
+		<listen>com.etone.ark.communication.socket.SocketByteMessageHeaderListener</listen>
+		<listen>com.etone.ark.kernel.remote.RemoteCityMessageResponseHandler</listen>
+		<listen>com.etone.ark.kernel.socket.ByteSyncMessageHandler</listen>
+		<listen>com.etone.ark.communication.socket.SocketByteMessageActionHeaderListener</listen>
+		<listen>com.etone.ark.kernel.remote.RemoteCityActionResponseHandler</listen>
+	</socketClient>
+	
+	<socketClient id="rtdNetCell" name="RTD网络信息" ip="${rtdNetCellIp}" port="${rtdNetCellPort}" type="json" linkHandle="com.etone.ark.kernel.socket.RtdNetSocketStatusHandler">
+		<listen>com.etone.ark.communication.socket.SocketJsonMessageHeaderListener</listen>
+		<listen>com.etone.ark.kernel.socket.JsonRtdNetHeartMessageHandler</listen>
+	</socketClient>
+	
+	
+	<httpService id="kernel" name="HTTP服务" ip="${httpServerIp}" port="${httpPort}" resourcePackage="com.etone.ark.kernel.http.resource">
+		<filter>com.etone.ark.kernel.http.ExpireFilter</filter>
+		<filter>com.etone.ark.kernel.http.TokenFilter</filter>
+	</httpService>
+
+</coummunication>

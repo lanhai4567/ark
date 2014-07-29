@@ -1,0 +1,540 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<protocols version="1.0">
+
+	<!-- 维护动作 -->
+	
+	<protocol code="rtdLogin" name="RTD登陆" timeout="120">
+		<request command="rtdLogin" type="json"></request>
+		<response command="rtdLogin" type="json">
+			<parameter name="status" value=""/>
+			<parameter name="systemID" value=""/>
+			<parameter name="systemTime" value=""/>
+			<parameter name="ftpRootDir" value=""/>
+			<parameter name="heartBeatPeriod" value=""/>
+		</response>
+	</protocol>
+	
+	<protocol code="tempLogin" name="临时登陆" timeout="120">
+		<request command="tempLogin" type="json"></request>
+		<response command="tempLogin" type="json"></response>
+	</protocol>
+	
+	<protocol code="rtdHeart" name="RTD心跳" timeout="120">
+		<request command="rtdHeart" type="json"></request>
+		<response command="rtdHeart" type="json">
+			<parameter name="systemTime" value=""/>
+		</response>
+	</protocol>
+	
+	<protocol code="rtdRelease" name="RTD重置" timeout="120">
+		<request command="rtdRelease" type="json"></request>
+		<response command="rtdRelease" type="json">
+			<parameter name="resultCode" value="SUCCESS"/>
+			<parameter name="errorDescription" value=""/>
+		</response>
+	</protocol>
+
+	<protocol code="sidLogin" name="SID登陆" timeout="120">
+		<request command="sidLogin" type="json"></request>
+		<response command="sidLogin" type="json">
+			<parameter name="status" value=""/>
+			<parameter name="systemID" value=""/>
+			<parameter name="systemTime" value=""/>
+			<parameter name="heartBeatPeriod" value=""/>
+		</response>
+	</protocol>
+	
+	<protocol code="sidHeart" name="RTD心跳" timeout="120">
+		<request command="sidHeart" type="json"></request>
+		<response command="sidHeart" type="json">
+			<parameter name="systemTime" value=""/>
+		</response>
+	</protocol>
+	
+	<!-- 业务动作 -->
+	
+	<protocol code="checkRegister" name="检查网络登记" timeout="60">
+		<request command="checkRegister" type="json">
+			<parameter name="operators" value="CMCC"/>
+			<parameter name="timeout" value="70"/>
+		</request>
+		<response command="checkRegister" type="json">
+			<parameter name="status" value="1"/>
+			<parameter name="resultCode" value="SUCCESS"/>
+			<parameter name="errorDescription" value=""/>
+			<parameter name="cellSignal" value="0"/>
+			<parameter name="cellInfo" value=""/>
+		</response>
+	</protocol>
+	
+	<protocol code="powerOn" name="模块加电" timeout="120">
+		<request command="powerOn" type="json">
+			<parameter name="userType" value="0"/>
+			<parameter name="cardType" value="1"/>
+			<parameter name="sidId" value=""/>
+			<parameter name="sidSlot" value=""/>
+			<parameter name="msisdn" value=""/>
+		</request>
+		<response command="powerOn" type="json">
+			<parameter name="resultCode" value=""/>
+			<parameter name="errorDescription" value=""/>
+		</response>
+	</protocol>
+	
+	<protocol code="powerOff" name="断电" timeout="60">
+		<request command="powerOff" type="json"></request>
+		<response command="powerOff" type="json">
+			<parameter name="resultCode" value=""/>
+			<parameter name="errorDescription" value=""/>
+		</response>
+	</protocol>
+	
+	<protocol code="register" name="登录网络" timeout="300">
+		<request command="register" type="json">
+			<parameter name="operators" value="CMCC"/>
+			<parameter name="timeout" value="280"/>
+			<parameter name="netType" value="GSM"/>
+		</request>
+		<response command="register" type="json">
+			<parameter name="resultCode" value=""/>
+			<parameter name="errorDescription" value=""/>
+			<parameter name="cellSignal" value="0"/>
+			<parameter name="cellInfo" value=""/>
+		</response>
+	</protocol>
+	
+	<protocol code="unregister" name="注销网络" timeout="120">
+		<request command="unregister" type="json"></request>
+		<response command="unregister" type="json">
+			<parameter name="resultCode" value=""/>
+			<parameter name="errorDescription" value=""/>
+		</response>
+	</protocol>
+	
+	<protocol code="voiceCall" name="语音呼叫" timeout="120">
+		<request command="voiceCall" type="json">
+			<parameter name="calledNumber" value=""></parameter>
+			<parameter name="recordLength" value="0"></parameter>
+		</request>
+		<response command="voiceCall" type="json">
+			<parameter name="resultCode" value=""/>
+			<parameter name="errorDescription" value=""/>
+			<parameter name="callTime" value=""/>
+			<parameter name="callRingTime" value=""/>
+			<parameter name="callAnswerTime" value=""/>
+			<parameter name="recordFile" value=""/>
+		</response>
+	</protocol>
+	
+	<protocol code="waitVoiceCallin" name="等待语音呼入" timeout="120">
+		<request command="waitVoiceCallin" type="json">
+			<parameter name="callNumber" value=""></parameter>
+			<parameter name="timeout" value="90"></parameter>
+		</request>
+		<response command="waitVoiceCallin" type="json">
+			<parameter name="resultCode" value=""/>
+			<parameter name="errorDescription" value=""/>
+			<parameter name="callNumber" value=""/>
+			<parameter name="calledRingTime" value=""/>
+		</response>
+	</protocol>
+	
+	<protocol code="voiceCallAnswer" name="语音接听" timeout="120">
+		<request command="voiceCallAnswer" type="json">
+			<parameter name="waitTime" value="0"></parameter>
+		</request>
+		<response command="voiceCallAnswer" type="json">
+			<parameter name="resultCode" value=""/>
+			<parameter name="errorDescription" value=""/>
+			<parameter name="calledAnswerTime" value=""/>
+		</response>
+	</protocol>
+	
+	<protocol code="voiceRP" name="录播音" timeout="120">
+		<request command="voiceRP" type="json">
+			<parameter name="voiceRPType" value="2"></parameter>
+			<parameter name="voiceFile" value="_Resource/test.wav"></parameter>
+			<parameter name="voiceLength" value="10"></parameter>
+		</request>
+		<response command="voiceRP" type="json">
+			<parameter name="resultCode" value=""/>
+			<parameter name="errorDescription" value=""/>
+			<parameter name="recordFile" value=""/>
+		</response>
+	</protocol>
+	
+	<protocol code="detectSinglePass" name="检查单通" timeout="120">
+		<request command="detectSinglePass" type="json">
+			<parameter name="voiceFile" value=""></parameter>
+			<parameter name="voiceLength" value="10"></parameter>
+		</request>
+		<response command="detectSinglePass" type="json">
+			<parameter name="resultCode" value=""/>
+			<parameter name="errorDescription" value=""/>
+		</response>
+	</protocol>
+	
+	<protocol code="hangupVoiceCall" name="语音挂机" timeout="120">
+		<request command="hangupVoiceCall" type="json">
+			<parameter name="waitTime" value="0"></parameter>
+		</request>
+		<response command="hangupVoiceCall" type="json">
+			<parameter name="resultCode" value=""/>
+			<parameter name="errorDescription" value=""/>
+			<parameter name="hangupTime" value=""/>
+		</response>
+	</protocol>
+	
+	<protocol code="setCallForward" name="设置呼叫转移" timeout="120">
+		<request command="setCallForward" type="json">
+			<parameter name="forwardType" value="0"/>
+			<parameter name="forwardNumber" value=""/>
+		</request>
+		<response command="setCallForward" type="json">
+			<parameter name="resultCode" value=""/>
+			<parameter name="errorDescription" value=""/>
+		</response>
+	</protocol>
+	
+	<protocol code="cancelCallForward" name="取消呼叫转移" timeout="120">
+		<request command="cancelCallForward" type="json"></request>
+		<response command="cancelCallForward" type="json">
+			<parameter name="resultCode" value=""/>
+			<parameter name="errorDescription" value=""/>
+		</response>
+	</protocol>
+	
+	<protocol code="setBusy" name="设置忙碌" timeout="120">
+		<request command="setBusy" type="json">
+			<parameter name="waitTime" value="0"></parameter>
+		</request>
+		<response command="setBusy" type="json">
+			<parameter name="resultCode" value=""/>
+			<parameter name="errorDescription" value=""/>
+		</response>
+	</protocol>
+	
+	<protocol code="sendDTMF" name="发送DTMF" timeout="120">
+		<request command="sendDTMF" type="json">
+			<parameter name="dtmfSequence" value=""></parameter>
+		</request>
+		<response command="sendDTMF" type="json">
+			<parameter name="resultCode" value=""/>
+			<parameter name="errorDescription" value=""/>
+			<parameter name="recordFile" value=""/>
+		</response>
+	</protocol>
+	
+	<protocol code="sendSMS" name="发送短信" timeout="120">
+		<request command="sendSMS" type="json">
+			<parameter name="calledNumber" value=""></parameter>
+			<parameter name="smsContent" value="Hi,My Name is kernel!"></parameter>
+			<parameter name="reportTimeout" value="0"></parameter>
+		</request>
+		<response command="sendSMS" type="json">
+			<parameter name="resultCode" value=""/>
+			<parameter name="errorDescription" value=""/>
+			<parameter name="sendTime" value=""/>
+			<parameter name="sendedTime" value=""/>
+			<parameter name="reportTime" value=""/>
+		</response>
+	</protocol>
+
+	<protocol code="receiveSMS" name="接收短信" timeout="120">
+		<request command="receiveSMS" type="json">
+			<parameter name="callNumber" value=""></parameter>
+			<parameter name="verifyContent" value="Hi,My Name is kernel!"></parameter>
+			<parameter name="receiveCount" value="1"></parameter>
+			<parameter name="receiveTimeout" value="300"></parameter>
+		</request>
+		<response command="receiveSMS" type="json">
+			<parameter name="resultCode" value=""/>
+			<parameter name="errorDescription" value=""/>
+			<parameter name="callNumber" value=""/>
+			<parameter name="receiveTime" value=""/>
+			<parameter name="smsContent" value=""/>
+		</response>
+	</protocol>
+	
+	<protocol code="pppDial" name="PPP拨号" timeout="120">
+		<request command="pppDial" type="json">
+			<parameter name="apnName" value="CMNET"/>
+			<parameter name="apnUser" value=""/>
+			<parameter name="apnPassword" value=""/>
+		</request>
+		<response command="pppDial" type="json">
+			<parameter name="resultCode" value=""/>
+			<parameter name="errorDescription" value=""/>
+			<parameter name="pppTime" value=""/>
+			<parameter name="pppedTime" value=""/>
+			<parameter name="ipAddress" value=""/>
+		</response>
+	</protocol>
+	
+	<protocol code="pppTerm" name="断开PPP拨号" timeout="120">
+		<request command="pppTerm" type="json"></request>
+		<response command="pppTerm" type="json">
+			<parameter name="resultCode" value=""/>
+			<parameter name="errorDescription" value=""/>
+			<parameter name="termTime" value=""/>
+		</response>
+	</protocol>
+
+	<protocol code="sendMMS" name="发送彩信" timeout="120">
+		<request command="sendMMS" type="json">
+			<parameter name="calledNumber" value=""></parameter>
+			<parameter name="gatewayIp" value="10.0.0.172"></parameter>
+			<parameter name="gatewayPort" value="80"></parameter>
+			<parameter name="protocol" value="wap2.0"></parameter>
+			<parameter name="mmsTitle" value=""></parameter>
+			<parameter name="mmsFile" value=""></parameter>
+		</request>
+		<response command="sendMMS" type="json">
+			<parameter name="resultCode" value=""/>
+			<parameter name="errorDescription" value=""/>
+			<parameter name="sendTime" value=""/>
+			<parameter name="sendedTime" value=""/>
+		</response>
+	</protocol>
+	
+	<protocol code="receivePush" name="接收push彩信" timeout="120">
+		<request command="receivePush" type="json">
+			<parameter name="callNumber" value=""></parameter>
+			<parameter name="receiveTimeout" value="30"></parameter>
+		</request>
+		<response command="receivePush" type="json">
+			<parameter name="resultCode" value=""/>
+			<parameter name="errorDescription" value=""/>
+			<parameter name="pushTime" value=""/>
+			<parameter name="smsContent" value=""/>
+			<parameter name="pushUrl" value=""/>
+			<parameter name="pushSender" value=""/>
+		</response>
+	</protocol>
+	
+	<protocol code="getMMS" name="接收彩信" timeout="120">
+		<request command="getMMS" type="json">
+			<parameter name="gatewayIp" value="10.0.0.172"></parameter>
+			<parameter name="gatewayPort" value="80"></parameter>
+			<parameter name="protocol" value="wap2.0"></parameter>
+			<parameter name="pushUrl" value=""></parameter>
+		</request>
+		<response command="getMMS" type="json">
+			<parameter name="resultCode" value=""/>
+			<parameter name="errorDescription" value=""/>
+			<parameter name="getTime" value=""/>
+			<parameter name="getedTime" value=""/>
+			<parameter name="mmsTitle" value=""/>
+			<parameter name="mmsFile" value=""/>
+		</response>
+	</protocol>
+
+	<protocol code="videoCall" name="视频呼叫" timeout="120">
+		<request command="videoCall" type="json">
+			<parameter name="calledNumber" value=""></parameter>
+			<parameter name="recordLength" value="0"></parameter>
+		</request>
+		<response command="videoCall" type="json">
+			<parameter name="resultCode" value=""/>
+			<parameter name="errorDescription" value=""/>
+			<parameter name="callTime" value=""/>
+			<parameter name="callRingTime" value=""/>
+			<parameter name="callAnswerTime" value=""/>
+			<parameter name="recordFile" value=""/>
+		</response>
+	</protocol>
+	
+	<protocol code="waitVideoCallin" name="等待语音呼入" timeout="120">
+		<request command="waitVideoCallin" type="json">
+			<parameter name="callNumber" value=""></parameter>
+			<parameter name="timeout" value="90"></parameter>
+		</request>
+		<response command="waitVideoCallin" type="json">
+			<parameter name="resultCode" value=""/>
+			<parameter name="errorDescription" value=""/>
+			<parameter name="callNumber" value=""/>
+			<parameter name="calledRingTime" value=""/>
+		</response>
+	</protocol>
+	
+	<protocol code="videoCallAnswer" name="视频接听" timeout="120">
+		<request command="videoCallAnswer" type="json">
+			<parameter name="waitTime" value="0"></parameter>
+		</request>
+		<response command="videoCallAnswer" type="json">
+			<parameter name="resultCode" value=""/>
+			<parameter name="errorDescription" value=""/>
+			<parameter name="calledAnswerTime" value=""/>
+		</response>
+	</protocol>
+	
+	<protocol code="videoRP" name="录播视频" timeout="120">
+		<request command="videoRP" type="json">
+			<parameter name="videoRPType" value="2"></parameter>
+			<parameter name="voiceFile" value="_Resource/test.wav"></parameter>
+			<parameter name="videoFile" value=""></parameter>
+			<parameter name="videoLength" value="10"></parameter>
+		</request>
+		<response command="videoRP" type="json">
+			<parameter name="resultCode" value=""/>
+			<parameter name="errorDescription" value=""/>
+			<parameter name="voiceRecordFile" value=""/>
+			<parameter name="videoRecordFile" value=""/>
+		</response>
+	</protocol>
+	
+	<protocol code="hangupVideoCall" name="视频挂机" timeout="120">
+		<request command="hangupVideoCall" type="json">
+			<parameter name="waitTime" value="0"></parameter>
+		</request>
+		<response command="hangupVideoCall" type="json">
+			<parameter name="resultCode" value=""/>
+			<parameter name="errorDescription" value=""/>
+			<parameter name="hangupTime" value=""/>
+		</response>
+	</protocol>
+
+	<protocol code="http" name="HTTP访问" timeout="240">
+		<request command="http" type="json">
+			<parameter name="url" value="www.baidu.com"/>
+			<parameter name="timeout" value="180"/>
+		</request>
+		<response command="http" type="json">
+			<parameter name="resultCode" value=""/>
+			<parameter name="errorDescription" value=""/>
+			<parameter name="dnsAnalyseTime" value=""/>
+			<parameter name="dnsAnalysedTime" value=""/>
+			<parameter name="connectTime" value=""/>
+			<parameter name="connectedTime" value=""/>
+			<parameter name="downloadTime" value=""/>
+			<parameter name="downloadedTime" value=""/>
+			<parameter name="downloadSize" value=""/>
+		</response>
+	</protocol>
+
+	<protocol code="wap" name="WAP访问" timeout="120">
+		<request command="wap" type="json">
+			<parameter name="gatewayIp" value="10.0.0.172"></parameter>
+			<parameter name="gatewayPort" value="80"></parameter>
+			<parameter name="url" value=""></parameter>
+			<parameter name="timeout" value="30"></parameter>
+		</request>
+		<response command="wap" type="json">
+			<parameter name="resultCode" value=""/>
+			<parameter name="errorDescription" value=""/>
+			<parameter name="connectTime" value=""/>
+			<parameter name="connectedTime" value=""/>
+			<parameter name="downloadTime" value=""/>
+			<parameter name="downloadedTime" value=""/>
+			<parameter name="downloadSize" value=""/>
+		</response>
+	</protocol>
+	
+	<protocol code="ftpUp" name="FTP上传" timeout="120">
+		<request command="ftpUp" type="json">
+			<parameter name="url" value=""></parameter>
+			<parameter name="ftpUserName" value=""></parameter>
+			<parameter name="ftpPassword" value=""></parameter>
+			<parameter name="uploadFile" value=""></parameter>
+			<parameter name="timeout" value="100"></parameter>
+		</request>
+		<response command="ftpUp" type="json">
+			<parameter name="resultCode" value=""/>
+			<parameter name="errorDescription" value=""/>
+			<parameter name="uploadTime" value=""/>
+			<parameter name="uploadedTime" value=""/>
+			<parameter name="uploadSize" value=""/>
+		</response>
+	</protocol>
+	
+	<protocol code="ftpDown" name="FTP下载" timeout="120">
+		<request command="ftpDown" type="json">
+			<parameter name="url" value=""></parameter>
+			<parameter name="ftpUserName" value=""></parameter>
+			<parameter name="ftpPassword" value=""></parameter>
+			<parameter name="downloadFile" value=""></parameter>
+			<parameter name="timeout" value="100"></parameter>
+		</request>
+		<response command="ftpDown" type="json">
+			<parameter name="resultCode" value=""/>
+			<parameter name="errorDescription" value=""/>
+			<parameter name="downloadTime" value=""/>
+			<parameter name="downloadedTime" value=""/>
+			<parameter name="downloadSize" value=""/>
+		</response>
+	</protocol>
+	
+	<protocol code="ping" name="PING命令" timeout="120">
+		<request command="ping" type="json">
+			<parameter name="url" value="www.baidu.com"></parameter>
+			<parameter name="packetSize" value="32"></parameter>
+			<parameter name="pingCount" value="3"></parameter>
+		</request>
+		<response command="ping" type="json">
+			<parameter name="resultCode" value=""/>
+			<parameter name="errorDescription" value=""/>
+			<parameter name="successCount" value=""/>
+			<parameter name="failCount" value=""/>
+			<parameter name="avgDelay" value=""/>
+			<parameter name="maxDelay" value=""/>
+			<parameter name="minDelay" value=""/>
+			<parameter name="ttl" value=""/>
+		</response>
+	</protocol>
+	
+	<protocol code="trace" name="TRACE" timeout="300">
+		<request command="trace" type="json">
+			<parameter name="url" value=""></parameter>
+		</request>
+		<response command="trace" type="json">
+			<parameter name="resultCode" value=""/>
+			<parameter name="errorDescription" value=""/>
+			<parameter name="traceTime" value=""/>
+			<parameter name="tracedTime" value=""/>
+		</response>
+	</protocol>
+	
+	<protocol code="telnet" name="TELENT" timeout="120">
+		<request command="telnet" type="json">
+			<parameter name="url" value=""></parameter>
+			<parameter name="telnetPort" value=""></parameter>
+			<parameter name="timeout" value="30"></parameter>
+		</request>
+		<response command="telnet" type="json">
+			<parameter name="resultCode" value=""/>
+			<parameter name="errorDescription" value=""/>
+		</response>
+	</protocol>
+	
+	<protocol code="attach" name="ATTACH" timeout="120">
+		<request command="attach" type="json">
+		</request>
+		<response command="attach" type="json">
+			<parameter name="resultCode" value=""/>
+			<parameter name="errorDescription" value=""/>
+			<parameter name="attachTime" value=""/>
+			<parameter name="attachedTime" value=""/>
+		</response>
+	</protocol>
+	
+	<protocol code="pdp" name="PDP" timeout="120">
+		<request command="pdp" type="json">
+			<parameter name="apnName" value="CMNET"/>
+			<parameter name="apnUser" value=""/>
+			<parameter name="apnPassword" value=""/>
+		</request>
+		<response command="pdp" type="json">
+			<parameter name="resultCode" value=""/>
+			<parameter name="errorDescription" value=""/>
+			<parameter name="pdpTime" value=""/>
+			<parameter name="pdpedTime" value=""/>
+		</response>
+	</protocol>
+	
+	<protocol code="pesq" name="pesq" timeout="120">
+		<request command="pesq" type="json">
+		</request>
+		<response command="pesq" type="json">
+		</response>
+	</protocol>
+</protocols>

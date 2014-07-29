@@ -1,0 +1,235 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<task version="1.0" id="fetion" name="飞信互相通讯业务">
+
+	<start id="start">
+		<transition to="initial" name="资源初始化" />
+	</start>
+	
+	<fork id="initial" name="资源初始化" join="initial_join">
+		<transition to="A_androidOpen"/>
+		<transition to="B_androidOpen"/>
+	</fork>
+	
+	<node id="A_androidOpen" name="A资源开机" resourcePrefix="resourceA_"  actionType="androidOpen">
+		<param name="sidId" value="${resourceA_.sidSerialNum}"/>
+	 	<param name="sidSlot" value="${resourceA_.sidSlotNum}"/>
+	 	<param name="accountName" value="${accountA[0].name}"/>
+	 	<param name="netType" value="${resourceA_.netType}"/>
+	 	<param name="accountType" value="${taskType}"/>
+        <transition to="initial_join" name="开机成功或失败" />
+    </node>
+    
+    <node id="B_androidOpen" name="B资源开机" resourcePrefix="resourceB_"  actionType="androidOpen">
+    	<param name="sidId" value="${resourceB_.sidSerialNum}"/>
+	 	<param name="sidSlot" value="${resourceB_.sidSlotNum}"/>
+	 	<param name="accountName" value="${accountB[0].name}"/>
+	 	<param name="netType" value="${resourceB_.netType}"/>
+	 	<param name="accountType" value="${taskType}"/>
+        <transition to="initial_join" name="开机成功或失败" />
+    </node>
+    
+    <join id="initial_join" name="资源初始化聚合">
+		<transition to="login" expression ="${A_androidOpen.resultCode == 'SUCCESS' &amp;&amp; B_androidOpen.resultCode == 'SUCCESS'}" name="初始化成功" />
+		<transition to="interrupt"  name="初始化失败" />
+	</join>
+    
+    <fork id="login" name="资源登陆" join="login_join">
+		<transition to="A_login"/>
+		<transition to="B_login"/>
+	</fork>
+    
+    <node id="A_login" name="A资源飞信登陆" resourcePrefix="resourceA_"  actionType="FETION_LOGIN_ACTION">
+    	<param name="account" value="${accountA[0]}"/>
+		<transition to="login_join" name="登陆成功或失败" />
+	</node>
+    
+	<node id="B_login" name="B资源飞信登陆" resourcePrefix="resourceB_"  actionType="FETION_LOGIN_ACTION">
+		<param name="account" value="${accountB[0]}"/>
+		<transition to="login_join" name="登陆成功或失败" />
+	</node>
+	
+	<join id="login_join" name="资源登陆聚合">
+		<transition to="business" expression ="${A_login.resultCode == 'SUCCESS' &amp;&amp; B_login.resultCode == 'SUCCESS'}" name="登陆成功" />
+		<transition to="initial_again" expression ="${isChangeAccountAgain(A_login,accountA,B_login,accountB)}" name="出现验证码重试" />
+		<transition to="interrupt"  name="登陆失败" />
+	</join>
+	
+	<!-- 资源重试 -->
+	<fork id="initial_again" name="资源初始化" join="initial_again_join">
+		<transition to="A_interrupt_again" expression="${A_login.resultCode == 'ENCOUNTER_VERIFICATION'}"/>
+		<transition to="B_interrupt_again" expression="${B_login.resultCode == 'ENCOUNTER_VERIFICATION'}"/>
+	</fork>
+	
+	<node id="A_interrupt_again" name="A资源中断" resourcePrefix="resourceA_" actionType="rtdRelease">
+		<transition to="A_androidOpen_again" />
+	</node>
+	
+	<node id="A_androidOpen_again" name="A资源开机" resourcePrefix="resourceA_"  actionType="androidOpen">
+		<param name="sidId" value="${resourceA_.sidSerialNum}"/>
+	 	<param name="sidSlot" value="${resourceA_.sidSlotNum}"/>
+	 	<param name="accountName" value="${accountA[1].name}"/>
+	 	<param name="netType" value="${resourceA_.netType}"/>
+	 	<param name="accountType" value="${taskType}"/>
+        <transition to="initial_again_join" name="开机成功或失败" />
+    </node>
+    
+    <node id="B_interrupt_again" name="B资源中断" resourcePrefix="resourceB_" actionType="rtdRelease">
+		<transition to="B_androidOpen_again" />
+	</node>
+    
+    <node id="B_androidOpen_again" name="B资源开机" resourcePrefix="resourceB_"  actionType="androidOpen">
+    	<param name="sidId" value="${resourceB_.sidSerialNum}"/>
+	 	<param name="sidSlot" value="${resourceB_.sidSlotNum}"/>
+	 	<param name="accountName" value="${accountB[1].name}"/>
+	 	<param name="netType" value="${resourceB_.netType}"/>
+	 	<param name="accountType" value="${taskType}"/>
+        <transition to="initial_again_join" name="开机成功或失败" />
+    </node>
+    
+    <join id="initial_again_join" name="资源初始化聚合">
+		<transition to="login_again" expression ="${(!A_androidOpen_again.resultCode || A_androidOpen_again.resultCode == 'SUCCESS') &amp;&amp; (!B_androidOpen_again.resultCode || B_androidOpen_again.resultCode == 'SUCCESS')}" name="初始化成功" />
+		<transition to="interrupt"  name="初始化失败" />
+	</join>
+    
+    <fork id="login_again" name="资源登陆" join="login_again_join">
+		<transition to="A_login_again"/>
+		<transition to="B_login_again"/>
+	</fork>
+    
+    <node id="A_login_again" name="A资源飞信登陆" resourcePrefix="resourceA_"  actionType="FETION_LOGIN_ACTION">
+    	<param name="account" value="${accountA[1]}"/>
+		<transition to="login_again_join" name="登陆成功或失败" />
+	</node>
+    
+	<node id="B_login_again" name="B资源飞信登陆" resourcePrefix="resourceB_"  actionType="FETION_LOGIN_ACTION">
+		<param name="account" value="${accountB[1]}"/>
+		<transition to="login_again_join" name="登陆成功或失败" />
+	</node>
+	
+	<join id="login_again_join" name="资源登陆聚合">
+		<transition to="business" expression ="${A_login_again.resultCode == 'SUCCESS' &amp;&amp; B_login_again.resultCode == 'SUCCESS'}" name="登陆成功" />
+		<transition to="interrupt"  name="登陆失败" />
+	</join>
+	
+	<!-- 业务 -->
+	<fork id="business" name="文本业务" join="business_join">
+		<transition to="A_send"/>
+		<transition to="B_receive"/>
+	</fork>
+	
+	<node id="A_send" name="A资源飞信发送消息" resourcePrefix="resourceA_"  actionType="FETION_SEND_ACTION">
+		<param name="content" value="${content}"/>
+		<param name="accountName" value="${getAccountName(B_login,null,accountB)}"></param>
+		<transition to="business_join"/>
+	</node>
+	
+	<node id="B_receive" name="B资源飞信接收消息" resourcePrefix="resourceB_"  actionType="FETION_RECEIVE_ACTION">
+		<param name="contrastText" value="${content}"/>
+		<param name="accountName" value="${getAccountName(A_login,null,accountA)}"></param>
+		<transition to="business_join"/>
+	</node>
+	
+	<join id="business_join" name="业务聚合">
+		<transition to="business_img" expression ="${A_send.resultCode == 'SUCCESS' &amp;&amp; B_receive.resultCode == 'SUCCESS'}" name="文本业务成功" />
+		<transition to="exitAndInterrupt"  name="文本业务失败" />
+	</join>
+	
+	<fork id="business_img" name="图片业务" join="business_img_join">
+		<transition to="A_send_img"/>
+		<transition to="B_receive_img"/>
+	</fork>
+	
+	<node id="A_send_img" name="A资源飞信发送图片" resourcePrefix="resourceA_"  actionType="FETION_SEND_IMG_ACTION">
+		<param name="imgName" value="${imgName}"/>
+		<param name="accountName" value="${getAccountName(B_login,null,accountB)}"></param>
+		<transition to="business_img_join"/>
+	</node>
+	
+	<node id="B_receive_img" name="B资源飞信接收图片" resourcePrefix="resourceB_"  actionType="FETION_RECEIVE_IMG_ACTION">
+		<param name="contrastImgName" value="${imgName}"/>
+		<param name="accountName" value="${getAccountName(A_login,null,accountA)}"></param>
+		<transition to="business_img_join"/>
+	</node>
+	
+	<join id="business_img_join" name="业务聚合">
+		<transition to="turnOff" expression ="${A_send_img.resultCode == 'SUCCESS' &amp;&amp; B_receive_img.resultCode == 'SUCCESS'}" name="业务成功" />
+		<transition to="exitAndInterrupt"  name="业务失败" />
+	</join>
+	
+	<!-- 资源释放 -->
+	
+	<fork id="turnOff" name="资源释放" join="turnOff_join">
+		<transition to="A_fetionExit"/>
+		<transition to="B_fetionExit"/>
+	</fork>
+	
+	<node id="A_fetionExit" name="A资源飞信退出" resourcePrefix="resourceA_" actionType="FETION_EXIT_ACTION">
+		<transition to="A_androidClose" expression="${A_fetionExit.resultCode == 'SUCCESS'}" name="飞信退出成功" />
+		<transition to="turnOff_join" />
+	</node>
+	
+	<node id="A_androidClose" name="A资源释放" resourcePrefix="resourceA_" actionType="androidClose">
+		<transition to="turnOff_join" />
+	</node>
+	
+	<node id="B_fetionExit" name="B资源飞信退出" resourcePrefix="resourceB_" actionType="FETION_EXIT_ACTION">
+		<transition to="B_androidClose" expression="${B_fetionExit.resultCode == 'SUCCESS'}" name="飞信退出成功" />
+		<transition to="turnOff_join" />
+	</node>
+	
+	<node id="B_androidClose" name="B资源释放" resourcePrefix="resourceB_" actionType="androidClose">
+		<transition to="turnOff_join" />
+	</node>
+	
+	<join id="turnOff_join" name="资源释放聚合">
+		<transition to="interrupt" expression ="${A_fetionExit.resultCode != 'SUCCESS' || A_androidClose.resultCode != 'SUCCESS' || B_fetionExit.resultCode != 'SUCCESS' || B_androidClose.resultCode != 'SUCCESS'}"/>
+		<transition to="end" />
+	</join>
+	
+	<!-- 退出登录后中断 -->
+	<fork id="exitAndInterrupt" name="设备中断" join="exitAndInterrupt_join">
+		<transition to="A_exitAndInterrupt"/>
+		<transition to="B_exitAndInterrupt"/>
+	</fork>
+	
+	<node id="A_exitAndInterrupt" name="退出登录" resourcePrefix="resourceA_" actionType="FETION_EXIT_ACTION">
+		<transition to="exitAndInterrupt_join" />
+	</node>
+
+	<node id="B_exitAndInterrupt" name="退出登录" resourcePrefix="resourceB_" actionType="FETION_EXIT_ACTION">
+		<transition to="exitAndInterrupt_join" />
+	</node>
+	
+	<join id="exitAndInterrupt_join" name="设备中断聚合">
+		<transition to="interrupt" />
+	</join>
+	
+	<!-- 资源中断 -->
+	
+	<fork id="interrupt" name="设备中断" join="interrupt_join">
+		<transition to="A_interrupt" expression="${A_androidClose == null || A_androidClose.resultCode != 'SUCCESS'}"/>
+		<transition to="B_interrupt" expression="${B_androidClose == null || B_androidClose.resultCode != 'SUCCESS'}"/>
+	</fork>
+
+	<node id="A_interrupt" name="A资源中断" resourcePrefix="resourceA_" actionType="rtdRelease">
+		<transition to="interrupt_join" />
+	</node>
+	
+	<node id="B_interrupt" name="B资源中断" resourcePrefix="resourceB_" actionType="rtdRelease">
+		<transition to="interrupt_join" />
+	</node>
+	
+	<join id="interrupt_join" name="设备中断聚合">
+		<transition to="end" />
+	</join>
+	
+	<end id="end" />
+	
+	<result>
+		<variable code="resultCode" name="结果码" value="${resultCode}"  javaType="String"  description=""/>
+		<variable code="errorDescription" name="错误描述" value="${errorDescription}"  javaType="String"  description=""/>
+		<variable code="loginDelay" name="登陆时长" value="${interval(A_login.loginEndTime,A_login.loginRequestTime)}"  javaType="Float"  description="公式：登陆完成时间点-登陆请求时间点"/>
+		<variable code="textTransmissionDelay" name="文本传输时长" value="${interval(B_receive.msgReceiveEndTime,A_send.msgSendTime)}"  javaType="Float"  description="公式：接收文本完成时间点 – 发送文本开始时间点"/>
+		<variable code="imgTransmissionDelay" name="图片传输时长" value="${interval(B_receive_img.imgReceiveEndTime,A_send_img.imgSendTime)}"  javaType="Float"  description="公式：接收图片完成时间点 – 发送图片开始时间点"/>
+	</result>
+</task>

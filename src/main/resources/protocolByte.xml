@@ -1,0 +1,235 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<protocols version="0.1">
+	<protocol code="rtdLogin" name="RTD登陆" timeout="120">
+		<response command="33281" type="byte">
+			<parameter name="systemId" type="Integer" length="2" value="1"></parameter>
+			<parameter name="systemTime" type="String" length="17" value=""></parameter>
+			<parameter name="ftpRootDir" type="String" length="64" value=""></parameter>
+			<parameter name="heartBeatPeriod" type="Integer" length="1" value=""></parameter>
+			<parameter name="softVersion" type="String" length="8" value=""></parameter>
+		</response>
+	</protocol>
+	
+	<protocol code="rtdHeart" name="RTD心跳" timeout="120">
+		<response command="33282" type="byte">
+			<parameter name="systemTime" type="String" length="17" value=""></parameter>
+			<parameter name="softVersion" type="String" length="8" value=""></parameter>
+			<parameter name="heartBeatPeriod" type="Integer" length="1" value=""></parameter>
+			<parameter name="ftpRootDir" type="String" length="64" value=""></parameter>
+		</response>
+	</protocol>
+	
+	<protocol code="rtdRelease" name="RTD重置" timeout="120">
+		<request command="517" type="byte" operationNum="1" operationLine="ED"></request>
+		<response command="33285" type="byte"></response>
+	</protocol>
+	
+	<protocol code="powerOn" name="加电" timeout="300">
+		<request command="529" type="byte" operationNum="1" operationLine="FF">
+			<parameter name="msisdn" type="String" length="20" value=""></parameter>
+			<parameter name="sidId" type="Integer" length="4" value=""></parameter>
+			<parameter name="sidSlot" type="Integer" length="1" value=""></parameter>
+		</request>
+		<response command="33297" type="byte">
+			<parameter name="cellInfo" type="String" length="256" value=""></parameter>
+			<parameter name="cellSignal" type="Integer" length="1" value=""></parameter>
+		</response>
+	</protocol>
+	
+	<protocol code="attach" name="ATTACH命令" timeout="120">
+		<request command="540" type="byte" operationNum="1" operationLine="DA"></request>
+		<response command="33308" type="byte">
+			<parameter name="attachBeginTime" type="String" length="17" value=""></parameter>
+			<parameter name="attachEndTime" type="String" length="17" value=""></parameter>
+		</response>
+	</protocol>
+
+	<protocol code="pdp" name="PDP命令" timeout="120">
+		<request command="541" type="byte" operationNum="1" operationLine="DB">
+			<parameter name="apnName" type="String" length="32" value=""></parameter>
+			<parameter name="apnUserName" type="String" length="10" value=""></parameter>
+			<parameter name="apnPassword" type="String" length="10" value=""></parameter>
+			<parameter name="ipPool" type="String" length="36" value=""></parameter>
+		</request>
+		<response command="33309" type="byte">
+			<parameter name="activateBeginTime" type="String" length="17" value=""></parameter>
+			<parameter name="activateEndTime" type="String" length="17" value=""></parameter>
+			<parameter name="ipAddress" type="String" length="18" value=""></parameter>
+		</response>
+	</protocol>
+	
+	<protocol code="wap" name="WAP命令" timeout="120">
+		<request command="545" type="byte" operationNum="1" operationLine="DB">
+			<parameter name="protocol" type="String" length="16" value=""></parameter>
+			<parameter name="gatewayIp" type="String" length="16" value=""></parameter>
+			<parameter name="gatewayPort" type="Integer" length="2" value=""></parameter>
+			<parameter name="url" type="String" length="80" value=""></parameter>
+			<parameter name="mobileAgent" type="String" length="64" value=""></parameter>
+		</request>
+		<response command="33313" type="byte">
+			<parameter name="connectBeginTime" type="String" length="17" value=""></parameter>
+			<parameter name="connectEndTime" type="String" length="17" value=""></parameter>
+			<parameter name="requestTime" type="String" length="17" value=""></parameter>
+			<parameter name="responseTime" type="String" length="17" value=""></parameter>
+			<parameter name="fileSize" type="Integer" length="2" value=""></parameter>
+			<parameter name="wapPageFile" type="String" length="64" value=""></parameter>
+			<parameter name="pcapFile" type="String" length="64" value=""></parameter>
+		</response>
+	</protocol>
+	
+	<protocol code="ping" name="PING命令" timeout="120">
+		<request command="542" type="byte" operationNum="3" operationLine="E2DCE3">
+			<parameter name="url" type="String" length="80" value=""></parameter>
+			<parameter name="packetSize" type="Integer" length="1" value=""></parameter>
+			<parameter name="pingCount" type="Integer" length="1" value=""></parameter>
+			<parameter name="apnName" type="String" length="32" value=""></parameter>
+			<parameter name="apnUser" type="String" length="10" value=""></parameter>
+			<parameter name="apnPassword" type="String" length="10" value=""></parameter>
+		</request>
+		<response command="33310" type="byte">
+			<parameter name="sentPackets" type="Integer" length="1" value=""></parameter>
+			<parameter name="receivedPackets" type="Integer" length="1" value=""></parameter>
+			<parameter name="receivedPackets" type="Integer" length="2" value=""></parameter>
+			<parameter name="pcapFile" type="String" length="63" value=""></parameter>
+		</response>
+	</protocol>
+	
+	<protocol code="voiceCall" name="语音呼叫" timeout="120">
+		<request command="530" type="byte" operationNum="5" operationLine="AASC(I1)A4A5">
+			<parameter name="calledNumber" type="String" length="20" value=""></parameter>
+			<parameter name="duration" type="Integer" length="1" value=""></parameter>
+			<parameter name="voiceFile" type="String" length="64" value=""></parameter>
+			<parameter name="playlength" type="Integer" length="1" value=""></parameter>
+			<parameter name="recordMoment" type="Integer" length="1" value=""></parameter>
+			<parameter name="dtmfTones" type="String" length="128" value=""></parameter>
+			<parameter name="isCollectCellInfo" type="Integer" length="2" value="0"></parameter>
+		</request>
+		<response command="33298" type="byte">
+			<parameter name="dialTime" text="拨号时间"  type="String" length="17" value=""></parameter>
+			<parameter name="establishTime" text="呼叫建立时间" type="String" length="17" value=""></parameter>
+			<parameter name="ringTime" text="开始震玲时间" type="String" length="17" value=""></parameter>
+			<parameter name="recordFile" text="录音文件名称" type="String" length="64" value=""></parameter>
+		</response>
+	</protocol>
+	
+	<protocol code="waitVoiceCallin" name="语音接听" timeout="120">
+		<request command="531" type="byte" operationNum="5" operationLine="ABSC(I1)A4A5">
+			<parameter name="callingNumber" text="主叫号码" type="String" length="20" value=""></parameter>
+			<parameter name="ringCount" text="几次震铃后接听" type="Integer" length="1" value="3"></parameter>
+			<parameter name="duration" text="通话时长，单位为秒" type="Integer" length="1" value=""></parameter>
+			<parameter name="voiceFile" text="[文件存放相对路径]/[放音文件名称](为空时不放音) ，如果文件不存在本地，则RTD向中心FTP服务器查找下载" type="String" length="64" value=""></parameter>
+			<parameter name="playlength" text="放音时间，单位为秒，为0时表示循环播放直到通话结束" type="Integer" length="1" value=""></parameter>
+			<parameter name="recordMoment" text="录音时刻：0 建立呼叫时录音 1 开始震铃时录音 2 建立通话时录音" type="Integer" length="1" value=""></parameter>
+			<parameter name="isCollectCellInfo" text="" type="Integer" length="2" value=""></parameter>
+		</request>
+		<response command="33299" type="byte">
+			<parameter name="ringTime"  text="开始震玲时间" type="String" length="17" value=""></parameter>
+			<parameter name="answerTime" text="接听时间" type="String" length="17" value=""></parameter>
+			<parameter name="recordFile" text="录音文件名称" type="String" length="64" value=""></parameter>
+		</response>
+	</protocol>
+	
+	<protocol code="sendSMS" name="发送短信" timeout="120">
+		<request command="536" type="byte" operationNum="3" operationLine="SC(I1)BA">
+			<parameter name="smsCenter" type="String" length="20" value=""></parameter>
+			<parameter name="calledNumber" type="String" length="20" value=""></parameter>
+			<parameter name="smsContent" type="String" length="256" value=""></parameter>
+			<parameter name="ifWaitForReport" type="Integer" length="1" value=""></parameter>
+			<parameter name="overTime" type="Integer" length="1" value=""></parameter>
+		</request>
+		<response command="33304" type="byte">
+			<parameter name="sendTime" text=""  type="String" length="17" value=""></parameter>
+			<parameter name="sendedTime" text="" type="String" length="17" value=""></parameter>
+			<parameter name="reportTime" text="" type="String" length="17" value=""></parameter>
+		</response>
+	</protocol>
+
+	<protocol code="receiveSMS" name="接收短信" timeout="120">
+		<request command="537" type="byte" operationNum="3" operationLine="SC(I1)BB">
+			<parameter name="callingNumber" text="" type="String" length="20" value=""></parameter>
+			<parameter name="smsCenter" text="" type="String" length="20" value=""></parameter>
+		</request>
+		<response command="33305" type="byte">
+			<parameter name="receiveTime"  text="" type="String" length="17" value=""></parameter>
+			<parameter name="receiveContent" text="" type="String" length="256" value=""></parameter>
+		</response>
+	</protocol>
+	
+	<protocol code="sendMMS" name="发送彩信" timeout="120">
+		<request command="538" type="byte" operationNum="" operationLine="">
+			<parameter name="calledNumber" text="" type="String" length="20" value=""></parameter>
+			<parameter name="mmsTitle" text="" type="String" length="16" value=""></parameter>
+			<parameter name="mmsFile" text="" type="String" length="64" value=""></parameter>
+			<parameter name="protocol" text="" type="String" length="16" value=""></parameter>
+			<parameter name="ifWaitForReport" text="" type="Integer" length="1" value=""></parameter>
+			<parameter name="overTime" text="" type="Integer" length="1" value=""></parameter>
+			<parameter name="apnName" type="String" length="32" value=""></parameter>
+			<parameter name="apnUserName" type="String" length="10" value=""></parameter>
+			<parameter name="apnPassword" type="String" length="10" value=""></parameter>
+		</request>
+		<response command="33306" type="byte">
+			<parameter name="sendTime" text="" type="String" length="17" value=""></parameter>
+			<parameter name="sendedTime" text="" type="String" length="17" value=""></parameter>
+			<parameter name="reportTime" text="" type="String" length="17" value=""></parameter>
+			<parameter name="pcapFile" text="" type="String" length="64" value=""></parameter>
+		</response>
+	</protocol>
+	
+	<protocol code="getMMS" name="接收彩信" timeout="120">
+		<request command="539" type="byte" operationNum="" operationLine="">
+			<parameter name="protocol" type="String" length="16" value=""></parameter>
+			<parameter name="smsCenter" type="String" length="20" value=""></parameter>
+			<parameter name="callNumber" type="String" length="20" value=""></parameter>
+		</request>
+		<response command="33307" type="byte">
+			<parameter name="pushTime" text=""  type="String" length="17" value=""></parameter>
+			<parameter name="getTime" text="" type="String" length="17" value=""></parameter>
+			<parameter name="getedTime" text="" type="String" length="17" value=""></parameter>
+			<parameter name="transactionId" text="" type="String" length="32" value=""></parameter>
+			<parameter name="mmsId" text="" type="String" length="32" value=""></parameter>
+			<parameter name="mmsTitle" text="" type="String" length="16" value=""></parameter>
+			<parameter name="mmsFile" text="" type="String" length="64" value=""></parameter>
+			<parameter name="pcapFile" text="" type="String" length="64" value=""></parameter>
+		</response>
+	</protocol>
+	
+	<protocol code="sync" name="同步" timeout="60">
+		<request command="518" type="byte" operationNum="" operationLine="">
+			<parameter name="operation" text="" type="String" length="2" value=""></parameter>
+			<parameter name="isGo" text="" type="Integer" length="2" value=""></parameter>
+		</request>
+		<response command="33286" type="byte">
+			<parameter name="operation" text="" type="String" length="2" value=""></parameter>
+			<parameter name="isGo" text="" type="Integer" length="2" value=""></parameter>
+		</response>
+	</protocol>
+
+	<protocol code="hangupVoiceCall" name="语音挂机" timeout="120">
+		<request command="533" type="byte" operationNum="1" operationLine="EC"></request>
+		<response command="33301" type="byte">
+			<parameter name="handupTime" text="挂机时间"  type="String" length="17" value=""></parameter>
+		</response>
+	</protocol>
+	
+	<protocol code="localLogin" name="登陆通讯中心" type="request" timeout="120">
+		<request command="2001" type="byte">
+			<parameter name="systemId" type="Integer" length="2" value="1"></parameter>
+			<parameter name="localLic" type="String" length="16" value=""></parameter>
+			<parameter name="version" type="String" length="2" value=""></parameter>
+			<parameter name="type" type="Integer" length="1" value=""></parameter>
+		</request>
+		<response command="2002" type="byte">
+			<parameter name="result" type="Integer" length="4" value="0"></parameter>
+		</response>
+	</protocol>
+	
+	<protocol code="localHeart" name="通讯中心心跳" timeout="120">
+		<request command="2003" type="byte">
+			<parameter name="systemId" type="Integer" length="2" value=""></parameter>
+			<parameter name="systemStatus" type="Integer" length="1" value=""></parameter>
+		</request>
+		<response command="2004" type="byte">
+			<parameter name="systemTime" type="String" length="18" value=""></parameter>
+		</response>
+	</protocol>
+</protocols>

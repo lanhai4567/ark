@@ -1,0 +1,230 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<task version="1.0" id="minCornet" name="智能网短号">
+
+	<start id="start">
+ 		<transition to="initial"  name="设备初始化"/>
+	</start>
+	
+	<!-- 初始化  -->
+	<fork id="initial" name="设备初始化" join="initial_join">
+		<transition to="A_checkRegister"/>
+		<transition to="B_checkRegister"/>
+	</fork>
+	
+	<!--  A -->
+    <node id="A_checkRegister" name="A_检测网络登记" resourcePrefix="resourceA_" actionType="checkRegister">
+        <param name="msisdn" value="${resourceA_.testNum}"/>
+        <transition to="A_powerOn" expression=" ${A_checkRegister.status != 0}" name="未开机" />
+        <transition to="initial_join" name="已开机" />
+    </node>
+
+	<node id="A_powerOn" name="A_模块加电" resourcePrefix="resourceA_" actionType="powerOn">
+		<param name="cardType" value="${resourceA_.cardType}"/>
+    	<param name="sidId" value="${resourceA_.sidSerialNum}"/>
+     	<param name="sidSlot" value="${resourceA_.sidSlotNum}"/>
+     	<param name="msisdn" value="${resourceA_.testNum}"/>
+		<transition to="A_register" expression=" ${A_powerOn.resultCode == 'SUCCESS'}" name="加电成功" />
+		<transition to="initial_join" expression="${A_powerOn.resultCode != 'SUCCESS'}" name="加电失败" />
+	</node>
+	
+	<node id="A_register" name="A_登记网络" resourcePrefix="resourceA_" actionType="register">
+		<param name="netType" value="${resourceA_.netType}"/>
+		<transition to="initial_join" name="网络成功或失败" />	
+	</node>
+	
+	<!--  B -->
+    <node id="B_checkRegister" name="B_检测网络登记" resourcePrefix="resourceB_" actionType="checkRegister">
+        <param name="msisdn" value="${resourceB_.testNum}"/>
+        <transition to="B_powerOn" expression=" ${B_checkRegister.status != 0}" name="未开机" />
+        <transition to="initial_join" name="已开机" />
+    </node>
+    
+	<node id="B_powerOn" name="B_模块加电" resourcePrefix="resourceB_" actionType="powerOn">
+		<param name="cardType" value="${resourceB_.cardType}"/>
+    	<param name="sidId" value="${resourceB_.sidSerialNum}"/>
+     	<param name="sidSlot" value="${resourceB_.sidSlotNum}"/>
+     	<param name="msisdn" value="${resourceB_.testNum}"/>
+		<transition to="B_register" expression=" ${B_powerOn.resultCode =='SUCCESS'}" name="加电成功" />
+		<transition to="initial_join" expression="${B_powerOn.resultCode != 'SUCCESS'}" name="加电失败" />
+	</node>
+	
+	<node id="B_register" name="B_登记网络" resourcePrefix="resourceB_" actionType="register">
+		<param name="netType" value="${resourceB_.netType}"/>
+		<transition to="initial_join" name="网络成功或失败" />	
+	</node>
+	
+	<join id="initial_join" name="资源初始化聚合">
+		<transition to="call" expression ="${(A_checkRegister.status == 0 || A_register.resultCode == 'SUCCESS') &amp;&amp; (B_checkRegister.status == 0 || B_register.resultCode == 'SUCCESS')}" name="初始化成功" />
+		<transition to="turnOff"  name="初始化失败" />
+	</join>
+    
+	<!-- 开始做业务 -->
+	<!-- 语音呼叫 -->
+	<fork id="call" name="呼叫" join="call_join">
+		<transition to="A_voiceCall" name="主叫语音呼叫" />
+		<transition to="B_waitVoiceCallin" name="被叫等待语音呼入" />
+	</fork>
+
+	<node id="A_voiceCall" name="主叫语音呼叫" resourcePrefix="resourceA_"  actionType="voiceCall">
+		<param name="calledNumber" value="${resourceB_.testNum}" />
+		<param name="recordLength" value="${waitTime}" />
+		<transition to="call_join" name="成功或失败" />
+	</node>
+
+	<node id="B_waitVoiceCallin" name="被叫等待语音呼入" resourcePrefix="resourceB_"  actionType="waitVoiceCallin">
+		<param name="callNumber" value="${resourceA_.testNum}" />
+		<param name="timeout" value="${waitTime}" />
+		<transition to="call_join" expression="${B_waitVoiceCallin.resultCode != 'SUCCESS'}" name="失败" />
+		<transition to="B_voiceCallAnswer" expression="${B_waitVoiceCallin.resultCode == 'SUCCESS'}" name="成功" />
+	</node>
+
+	<node id="B_voiceCallAnswer" name="被叫语音接听"  resourcePrefix="resourceB_" actionType="voiceCallAnswer">
+		<param name="waitTime" value="${waitTime}" />
+		<transition to="call_join" />
+	</node>
+	
+	<join id="call_join">
+		<transition to="release" expression="${A_voiceCall.resultCode != 'SUCCESS' || B_waitVoiceCallin.resultCode != 'SUCCESS' || B_voiceCallAnswer.resultCode != 'SUCCESS'}" name="失败" />
+		<transition to="voice" expression=" ${A_voiceCall.resultCode == 'SUCCESS' &amp;&amp; B_voiceCallAnswer.resultCode == 'SUCCESS'}" name="成功" />
+	</join>
+
+	<!-- 录音 -->
+	<fork id="voice" name="录音" join="voice_join">
+		<transition to="A_voiceRP" name="主叫录播音" />
+		<transition to="B_voiceRP" name="被叫录播音" />
+	</fork>
+
+	<!-- A -->
+	<node id="A_voiceRP" name="主叫录播音"  resourcePrefix="resourceA_" actionType="voiceRP">
+		<param name="voiceLength" value="${duration}" />
+		<param name="voiceRPType" value="${voiceRPType}" />
+		<param name="voiceFile" value="${voiceFile}" />
+		<transition to="voice_join" name="成功或失败" />
+	</node>
+
+	<!-- B -->
+
+	<node id="B_voiceRP" name="被叫录播音"  resourcePrefix="resourceB_" actionType="voiceRP">
+		<param name="voiceLength" value="${duration}" />
+		<param name="voiceRPType" value="${voiceRPType}" />
+		<param name="voiceFile" value="${voiceFile}" />
+		<transition to="voice_join" name="成功或失败" />
+	</node>
+
+	<join id="voice_join" name="录音聚合">
+		<transition to="pesq" expression="${A_voiceRP.resultCode == 'SUCCESS' &amp;&amp; B_voiceRP.resultCode == 'SUCCESS'}"></transition>
+		<transition to="release" />
+	</join>
+	
+	<fork id="pesq" name="PESQ语音评定" join="pesq_join">
+		<transition to="A_pesq" />
+		<transition to="B_pesq" />
+	</fork>
+
+	<!-- A -->
+	<node id="A_pesq" name="主叫pesq评分"  resourcePrefix="resourceA_" actionType="pesq">
+		<param name="voiceFile" value="${voiceFile}"/>
+		<param name="recordFile" value="${A_voiceRP.recordFile}"/> <!-- ${A_voiceRP.recordFile} -->
+		<transition to="pesq_join" name="成功或失败" />
+	</node>
+
+	<!-- B -->
+	<node id="B_pesq" name="被叫pesq评分"  resourcePrefix="resourceB_" actionType="pesq">
+		<param name="voiceFile" value="${voiceFile}"/>
+		<param name="recordFile" value="${B_voiceRP.recordFile}"/> <!-- ${B_voiceRP.recordFile} -->
+		<transition to="pesq_join" name="成功或失败" />
+	</node>
+
+	<join id="pesq_join" name="PESQ语音评定聚合">
+		<transition to="detectSinglePass"  expression="${isDetectSinglePass == 1}"/>
+		<transition to="release" />
+	</join>
+	
+	<!-- 检查单通 -->
+	<fork id="detectSinglePass" name="单通检查分支" join="detectSinglePass_join">
+		<transition to="A_detectSinglePass" />
+		<transition to="B_detectSinglePass" />
+	</fork>
+
+	<!-- A -->
+	<node id="A_detectSinglePass" name="主叫单通检查"  resourcePrefix="resourceA_" actionType="detectSinglePass">
+		<param name="voiceFile" value="${A_voiceRP.recordFile}"/>
+		<param name="voiceLength" value="${duration}"/>
+		<transition to="detectSinglePass_join" name="成功或失败" />
+	</node>
+
+	<!-- B -->
+	<node id="B_detectSinglePass" name="被叫单通检查"  resourcePrefix="resourceB_" actionType="detectSinglePass">
+		<param name="voiceFile" value="${B_voiceRP.recordFile}"/>
+		<param name="voiceLength" value="${duration}"/>
+		<transition to="detectSinglePass_join" name="成功或失败" />
+	</node>
+
+	<join id="detectSinglePass_join" name="单通检查聚合">
+		<transition to="release" />
+	</join>
+
+	<!-- 资源释放 -->
+	<fork id="release" join="release_join">
+		<transition to="A_hangupVoiceCall" />
+		<transition to="B_hangupVoiceCall" />
+	</fork>
+
+	<node id="A_hangupVoiceCall" name="主叫挂机"  resourcePrefix="resourceA_" actionType="hangupVoiceCall">
+		<transition to="release_join" />
+	</node>
+
+	<node id="B_hangupVoiceCall" name="被叫挂机" resourcePrefix="resourceB_" actionType="hangupVoiceCall">
+		<transition to="release_join" />
+	</node>
+
+	<join id="release_join" name="资源释放聚合">
+		<transition to="turnOff" />
+	</join>
+
+	<fork id="turnOff" name="资源释放" join="turnOff_join">
+        <transition to="A_powerOff" expression="${A_register.resultCode != 'SUCCESS' &amp;&amp; A_powerOn.resoultCode == 'SUCCESS'}"/>
+        <transition to="B_powerOff" expression="${B_register.resultCode  != 'SUCCESS' &amp;&amp; B_powerOn.resoultCode == 'SUCCESS'}"/>
+		<transition to="A_unregister" expression="${resourceA_close == true &amp;&amp; (A_checkRegister.resultCode == 0 || A_register.resultCode == 'SUCCESS')}"/>
+		<transition to="B_unregister" expression="${resourceB_close == true &amp;&amp; (B_checkRegister.resultCode == 0 || B_register.resultCode == 'SUCCESS')}"/>
+	</fork>
+	
+	<node id="A_unregister" name="A_注销网络" resourcePrefix="resourceA_" actionType="unregister">
+		<transition to="A_powerOff" />
+	</node>
+
+	<node id="A_powerOff" name="A_模块断电" resourcePrefix="resourceA_" actionType="powerOff">
+		<transition to="turnOff_join" />
+	</node>
+
+	<node id="B_unregister" name="B_注销网络" resourcePrefix="resourceB_" actionType="unregister">
+		<transition to="B_powerOff" />
+	</node>
+
+	<node id="B_powerOff" name="B_模块断电" resourcePrefix="resourceB_" actionType="powerOff">
+		<transition to="turnOff_join" />
+	</node>
+
+	<join id="turnOff_join">
+		<transition to="end"></transition>
+	</join>
+	
+	<end id="end" name="流程结束" />
+
+	<result>
+		<variable code="resultCode" name="结果码" value="${resultCode}"  javaType="String"  description=""/>
+		<variable code="errorDescription" name="错误描述" value="${errorDescription}"  javaType="String"  description=""/>
+		<variable code="callTime" name="拨号时间"  value="${A_voiceCall.callTime}"  javaType="Date" description="语音呼叫动作"/>
+		<variable code="callRingTime" name="主叫振铃时间"  value="${A_voiceCall.callRingTime}"  javaType="Date" description="语音呼叫动作的callRingTime"/>
+		<variable code="callAnswerTime" name="主叫接听时间"  value="${A_voiceCall.callAnswerTime}"  javaType="Date" description="语音呼叫动作的callAnswerTime"/>
+		<variable code="calledRingTime" name="被叫振铃时间"  value="${B_waitVoiceCallin.calledRingTime}"  javaType="Date" description="等待语音呼入动作的calledRingTime"/>
+		<variable code="calledAnswerTime" name="被叫接听时间"  value="${B_voiceCallAnswer.calledAnswerTime}"  javaType="Date" description="语音接听动作的calledAnswerTime"/>
+		<variable code="hangupTime" name="被叫挂机时间"  value="${B_hangupVoiceCall.hangupTime}"  javaType="Date"  description="被叫语音挂机动作"/>
+		<variable code="noticeFile" name="提示音录音"	 value="${A_voiceCall.recordFile}"  javaType="String"  description="语音呼叫动作的recordFile"/>
+		<variable code="callRecordFile" name="主叫通话录音"  value="${A_voiceRP.recordFile}"  javaType="String"  description="主叫录播音动作的recordFile"/>
+		<variable code="callPesqValue" name="主叫语音质量"  value="${A_pesq.pesqValue}"  javaType="Integer"  description="主叫PESQ"/>
+		<variable code="calledRecordFile" name="被叫通话录音"  value="${B_voiceRP.recordFile}"  javaType="String"  description="被叫录播音动作的recordFile"/>
+		<variable code="calledPesqValue" name="被叫语音质量"  value="${B_pesq.pesqValue}"  javaType="Integer"  description="被叫PESQ"/>
+		<variable code="connectLatency" name="呼叫接续时延"   value="${interval(B_waitVoiceCallin.calledRingTime,A_voiceCall.callTime)}"  javaType="Float"  description="公式：被叫振铃时间-拨号时间"/>
+	</result>
+</task>

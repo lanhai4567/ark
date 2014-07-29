@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<task version="1.0" id="p2pSMS" name="点对点短信">
+	
+	<start id="start">
+ 		<transition to="initial"  name="设备初始化"/>
+	</start>
+	
+	<!-- 初始化  -->
+	<fork id="initial" name="设备初始化" join="initial_join">
+		<transition to="A_checkRegister"/>
+		<transition to="B_checkRegister"/>
+	</fork>
+	
+	<!--  A -->
+    <node id="A_checkRegister" name="A_检测网络登记" resourcePrefix="resourceA_" actionType="checkRegister">
+        <param name="msisdn" value="${resourceA_.testNum}"/>
+        <transition to="A_powerOn" expression=" ${A_checkRegister.status != 0}" name="未开机" />
+        <transition to="initial_join" name="已开机" />
+    </node>
+
+	<node id="A_powerOn" name="A_模块加电" resourcePrefix="resourceA_" actionType="powerOn">
+		<param name="cardType" value="${resourceA_.cardType}"/>
+    	<param name="sidId" value="${resourceA_.sidSerialNum}"/>
+     	<param name="sidSlot" value="${resourceA_.sidSlotNum}"/>
+     	<param name="msisdn" value="${resourceA_.testNum}"/>
+		<transition to="A_register" expression=" ${A_powerOn.resultCode == 'SUCCESS'}" name="加电成功" />
+		<transition to="initial_join" expression="${A_powerOn.resultCode != 'SUCCESS'}" name="加电失败" />
+	</node>
+	
+	<node id="A_register" name="A_登记网络" resourcePrefix="resourceA_" actionType="register">
+		<param name="netType" value="${resourceA_.netType}"/>
+		<transition to="initial_join" name="网络成功或失败" />	
+	</node>
+	
+	<!--  B -->
+    <node id="B_checkRegister" name="B_检测网络登记" resourcePrefix="resourceB_" actionType="checkRegister">
+        <param name="msisdn" value="${resourceB_.testNum}"/>
+        <transition to="B_powerOn" expression=" ${B_checkRegister.status != 0}" name="未开机" />
+        <transition to="initial_join" name="已开机" />
+    </node>
+    
+	<node id="B_powerOn" name="B_模块加电" resourcePrefix="resourceB_" actionType="powerOn">
+		<param name="cardType" value="${resourceB_.cardType}"/>
+    	<param name="sidId" value="${resourceB_.sidSerialNum}"/>
+     	<param name="sidSlot" value="${resourceB_.sidSlotNum}"/>
+     	<param name="msisdn" value="${resourceB_.testNum}"/>
+		<transition to="B_register" expression=" ${B_powerOn.resultCode =='SUCCESS'}" name="加电成功" />
+		<transition to="initial_join" expression="${B_powerOn.resultCode != 'SUCCESS'}" name="加电失败" />
+	</node>
+	
+	<node id="B_register" name="B_登记网络" resourcePrefix="resourceB_" actionType="register">
+		<param name="netType" value="${resourceB_.netType}"/>
+		<transition to="initial_join" name="网络成功或失败" />	
+	</node>
+	
+	<join id="initial_join" name="资源初始化聚合">
+		<transition to="sms" expression ="${(A_checkRegister.status == 0 || A_register.resultCode == 'SUCCESS') &amp;&amp; (B_checkRegister.status == 0 || B_register.resultCode == 'SUCCESS')}" name="初始化成功" />
+		<transition to="turnOff"  name="初始化失败" />
+	</join>
+    
+	<!-- 开始做业务 -->
+	<fork id="sms" name="短信" join="sms_join">
+		<transition to="A_sendSMS"  name="主叫发送短信" />
+		<transition to="B_receiveSMS" name="被叫接收短信" />
+	</fork>
+	
+	<node id="A_sendSMS" name="主叫发送短信" resourcePrefix="resourceA_" actionType="sendSMS">
+		<param name="calledNumber" value="${resourceB_.testNum}"/>
+        <param name="smsContent" value="${smsContent}"/>
+        <param name="reportTimeout" value="${reportTimeout}"/>
+		<transition to="sms_join" name="成功或失败"/>
+	</node>
+
+	<node id="B_receiveSMS" name="被叫接收短信" resourcePrefix="resourceB_" actionType="receiveSMS">
+        <param name="callNumber" value="${resourceA_.testNum}"/>
+        <param name="verifyContent" value="${smsContent}"/>
+        <param name="receiveTimeout" value="${receiveTimeout}"/>
+		<transition to="sms_join" name="成功或失败"/>
+ 	</node>
+	
+	<join id="sms_join">
+		<transition to="turnOff" name="业务完成" />
+	</join>
+	
+	<!-- 资源释放 -->
+	<fork id="turnOff" name="资源释放" join="turnOff_join">
+        <transition to="A_powerOff" expression="${A_register.resultCode != 'SUCCESS' &amp;&amp; A_powerOn.resoultCode == 'SUCCESS'}"/>
+        <transition to="B_powerOff" expression="${B_register.resultCode  != 'SUCCESS' &amp;&amp; B_powerOn.resoultCode == 'SUCCESS'}"/>
+		<transition to="A_unregister" expression="${resourceA_close == true &amp;&amp; (A_checkRegister.resultCode == 0 || A_register.resultCode == 'SUCCESS')}"/>
+		<transition to="B_unregister" expression="${resourceB_close == true &amp;&amp; (B_checkRegister.resultCode == 0 || B_register.resultCode == 'SUCCESS')}"/>
+	</fork>
+	
+	<node id="A_unregister" name="A_注销网络" resourcePrefix="resourceA_" actionType="unregister">
+		<transition to="A_powerOff" />
+	</node>
+
+	<node id="A_powerOff" name="A_模块断电" resourcePrefix="resourceA_" actionType="powerOff">
+		<transition to="turnOff_join" />
+	</node>
+
+	<node id="B_unregister" name="B_注销网络" resourcePrefix="resourceB_" actionType="unregister">
+		<transition to="B_powerOff" />
+	</node>
+
+	<node id="B_powerOff" name="B_模块断电" resourcePrefix="resourceB_" actionType="powerOff">
+		<transition to="turnOff_join" />
+	</node>
+
+	<join id="turnOff_join">
+		<transition to="end"></transition>
+	</join>
+	
+	<end id="end" name="流程结束" />
+	
+	<result>
+		<variable code="resultCode" name="结果码" value="${resultCode}" javaType="String"  description=""/>
+		<variable code="errorDescription" name="错误描述" value="${errorDescription}" javaType="String"  description=""/>
+		<variable code="sendTime" name="发送时间" value="${A_sendSMS.sendTime}" javaType="String" description="发送短信动作"/>
+		<variable code="sendedTime" name="发送完成时间"  value="${A_sendSMS.sendedTime}" javaType="String"  description="发送短信动作"/>
+		<variable code="reportTime" name="状态报告时间" value="${A_sendSMS.reportTime}"  javaType="String" description="发送短信动作"/>
+		<variable code="receiveCount" name="接收短信条数"  value="${B_receiveSMS.receiveCount}" javaType="Integer"  description="接收短信动作"/>
+		<variable code="smsContent" name="接收的短信内容" value="${B_receiveSMS.smsContent}"  javaType="String" description="接收短信动作"/>
+		<variable code="sendLatency" name="短信发送时延" value="${interval(A_sendSMS.sendedTime,A_sendSMS.sendTime)}"  javaType="Float" description="公式：发送完成时间-发送开始时间"/>
+		<variable code="revLatency" name="短信接收时延" value="${interval(B_receiveSMS.receiveTime,A_sendSMS.sendedTime)}"  javaType="Float" description="公式：接收时间-发送结束时间"/>
+		<variable code="p2pLatency" name="短信端到端时延" value="${interval(B_receiveSMS..receiveTime,A_sendSMS.sendTime)}"  javaType="Float" description="公式：接收时间-发送开始时间"/>
+	</result>
+</task>

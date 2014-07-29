@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<task version="1.0" id="ping" name="PING检测" >
+
+	<start id="start">
+		<transition to="A_checkRegister" name="检测网络登记" />
+	</start>
+	
+	 <node id="A_checkRegister" name="检测网络登记" resourcePrefix="resourceA_"  actionType="checkRegister">
+        <param name="msisdn" value="${resourceA_.testNum}"/>
+        <transition to="A_powerOn" expression=" ${A_checkRegister.status != 0}" name="未登记网络，需要加电" />
+        <transition to="A_pppDial" name="已登记网络" />
+    </node>
+	
+	<node id="A_powerOn" name="模块加电" resourcePrefix="resourceA_"  actionType="powerOn">
+	 	<param name="cardType" value="${resourceA_.cardType}"/>
+    	<param name="sidId" value="${resourceA_.sidSerialNum}"/>
+     	<param name="sidSlot" value="${resourceA_.sidSlotNum}"/>
+     	<param name="msisdn" value="${resourceA_.testNum}"/>
+		<transition to="A_register" expression=" ${A_powerOn.resultCode == 'SUCCESS'}" name="加电成功" />
+		<transition to="end" expression="${A_powerOn.resultCode != 'SUCCESS'}" name="加电失败" />
+	</node>
+	
+	<node id="A_register" name="登记网络" resourcePrefix="resourceA_"  actionType="register">
+		<param name="netType" value="${resourceA_.netType}"/>
+		<transition to="A_pppDial" expression="${A_register.resultCode == 'SUCCESS'}" name="登记成功" />
+		<transition to="A_powerOff" expression="${A_register.resultCode != 'SUCCESS'}" name="登记失败" />
+	</node>
+
+    <node id="A_pppDial" name="PPP拨号" resourcePrefix="resourceA_"  actionType="pppDial">
+        <param name="apnName" value="${apnName}"/>
+        <param name="apnUser" value="${apnUser}"/>
+        <param name="apnPassword" value="${apnPassword}"/>
+        <transition to="A_ping" expression=" ${A_pppDial.resultCode == 'SUCCESS'}" name="PPP拨号成功" />
+        <transition to="A_unregister" expression="${this.resourceA_close == true}" name="PPP拨号失败，需要注销网络" />
+        <transition to="end" name="PPP拨号失败，不注销网络"/>
+    </node>
+	
+	<node id="A_ping" name="PING检测" resourcePrefix="resourceA_"  actionType="ping">
+        <param name="url" value="${url}"/>
+        <param name="packetSize" value="${packetSize}"/>
+        <param name="pingCount" value="${pingCount}"/>
+        <transition to="A_pppTerm" name="PING成功或失败" />
+	</node>
+
+    <node id="A_pppTerm" name="断开PPP拨号" resourcePrefix="resourceA_"  actionType="pppTerm">
+        <transition to="A_unregister" expression="${this.resourceA_close == true}"  />
+        <transition to="end" />
+    </node>
+
+	<node id="A_unregister" name="注销网络" resourcePrefix="resourceA_"  actionType="unregister">
+		<transition to="A_powerOff" />
+	</node>
+
+	<node id="A_powerOff" name="模块断电" resourcePrefix="resourceA_"  actionType="powerOff">
+		<transition to="end" />
+	</node>
+	
+	<end id="end" name="流程结束" />
+
+	<result>
+		<variable code="resultCode" name="结果码" value="${resultCode}"  javaType="String"  description=""/>
+		<variable code="errorDescription" name="错误描述" value="${errorDescription}"  javaType="String"  description=""/>
+		<variable code="pppTime" name="PPP拨号开始时间" value="${A_pppDial.pppTime}"  javaType="String" description="PPP拨号动作"/>
+		<variable code="pppedTime" name="PPP拨号结束时间"  value="${A_pppDial.pppedTime}"  javaType="String"  description="PPP拨号动作"/>
+		<variable code="ipAddress" name="IP地址" value="${A_pppDial.ipAddress}"   javaType="String" description="PPP拨号动作"/>
+		<variable code="successCount" name="成功次数" value="${A_ping.successCount}"   javaType="String" description="PING动作"/>
+		<variable code="failCount" name="失败次数" value="${A_ping.failCount}"   javaType="String" description="PING动作"/>
+		<variable code="avgDelay" name="平均时延" value="${A_ping.avgDelay}"   javaType="String" description="PING动作"/>
+		<variable code="maxDelay" name="最大时延" value="${A_ping.maxDelay}"   javaType="String" description="PING动作"/>
+		<variable code="minDelay" name="最小时延" value="${A_ping.minDelay}"  javaType="String"  description="PING动作"/>
+		<variable code="ttl" name="生存时间" value="${A_ping.ttl}"  javaType="Integer"  description="PING动作"/>
+		<variable code="dialLatency" name="PPP拨号时延" value="${interval(A_pppDial.pppedTime,A_pppDial.pppTime)}"  javaType="Float"  description="公式：PPP拨号结束时间 - PPP拨号开始时间"/>
+	</result>
+</task>

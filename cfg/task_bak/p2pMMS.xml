@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<task version="1.0" id="p2pMMS" name="点对点彩信" >
+	
+	<start id="start">
+ 		<transition to="initial"  name="设备初始化"/>
+	</start>
+	
+	<!-- 初始化  -->
+	<fork id="initial" name="设备初始化" join="initial_join">
+		<transition to="A_checkRegister"/>
+		<transition to="B_checkRegister"/>
+	</fork>
+	
+	<!--  A -->
+    <node id="A_checkRegister" name="A_检测网络登记" resourcePrefix="resourceA_" actionType="checkRegister">
+        <param name="msisdn" value="${resourceA_.testNum}"/>
+        <transition to="A_powerOn" expression=" ${A_checkRegister.status != 0}" name="未开机" />
+        <transition to="initial_join" name="已开机" />
+    </node>
+
+	<node id="A_powerOn" name="A_模块加电" resourcePrefix="resourceA_" actionType="powerOn">
+		<param name="cardType" value="${resourceA_.cardType}"/>
+    	<param name="sidId" value="${resourceA_.sidSerialNum}"/>
+     	<param name="sidSlot" value="${resourceA_.sidSlotNum}"/>
+     	<param name="msisdn" value="${resourceA_.testNum}"/>
+		<transition to="A_register" expression=" ${A_powerOn.resultCode == 'SUCCESS'}" name="加电成功" />
+		<transition to="initial_join" expression="${A_powerOn.resultCode != 'SUCCESS'}" name="加电失败" />
+	</node>
+	
+	<node id="A_register" name="A_登记网络" resourcePrefix="resourceA_" actionType="register">
+		<param name="netType" value="${resourceA_.netType}"/>
+		<transition to="initial_join" name="网络成功或失败" />	
+	</node>
+	
+	<!--  B -->
+    <node id="B_checkRegister" name="B_检测网络登记" resourcePrefix="resourceB_" actionType="checkRegister">
+        <param name="msisdn" value="${resourceB_.testNum}"/>
+        <transition to="B_powerOn" expression=" ${B_checkRegister.status != 0}" name="未开机" />
+        <transition to="initial_join" name="已开机" />
+    </node>
+    
+	<node id="B_powerOn" name="B_模块加电" resourcePrefix="resourceB_" actionType="powerOn">
+		<param name="cardType" value="${resourceB_.cardType}"/>
+    	<param name="sidId" value="${resourceB_.sidSerialNum}"/>
+     	<param name="sidSlot" value="${resourceB_.sidSlotNum}"/>
+     	<param name="msisdn" value="${resourceB_.testNum}"/>
+		<transition to="B_register" expression=" ${B_powerOn.resultCode =='SUCCESS'}" name="加电成功" />
+		<transition to="initial_join" expression="${B_powerOn.resultCode != 'SUCCESS'}" name="加电失败" />
+	</node>
+	
+	<node id="B_register" name="B_登记网络" resourcePrefix="resourceB_" actionType="register">
+		<param name="netType" value="${resourceB_.netType}"/>
+		<transition to="initial_join" name="网络成功或失败" />	
+	</node>
+	
+	<join id="initial_join" name="资源初始化聚合">
+		<transition to="A_pppDial" expression ="${(A_checkRegister.status == 0 || A_register.resultCode == 'SUCCESS') &amp;&amp; (B_checkRegister.status == 0 || B_register.resultCode == 'SUCCESS')}" name="初始化成功" />
+		<transition to="turnOff"  name="初始化失败" />
+	</join>
+    
+	<!-- 开始做业务 -->
+	<!-- 主叫发送彩信 -->
+	<node id="A_pppDial" name="主叫PPP拨号" resourcePrefix="resourceA_" actionType="pppDial">
+        <param name="apnName" value="${apnName}"/>
+        <param name="apnUser" value="${apnUser}"/>
+        <param name="apnPassword" value="${apnPassword}"/>
+        <transition to="mms" expression="${A_pppDial.resultCode=='SUCCESS'}" name="PPP拨号成功" />
+        <transition to="turnOff"  name="PPP拨号失败" />
+	</node>
+	
+	<fork id="mms" name="发送彩信" join="mms_join">
+		<transition to="A_sendMMS"  name="主叫发送彩信" />
+		<transition to="B_receivePush" name="被叫接收push短信" />
+	</fork>
+	
+	<node id="A_sendMMS" name="主叫发送彩信" resourcePrefix="resourceA_" actionType="sendMMS">
+		<param name="calledNumber" value="${resourceB_.testNum}"/>
+        <param name="protocol" value="${protocol}"/>
+        <param name="gatewayIp" value="${gatewayIp}"/>
+        <param name="gatewayPort" value="${gatewayPort}"/>
+        <param name="mmsTitle" value="${mmsTitle}"/>
+        <param name="mmsFile" value="${mmsFile}"/>
+		<transition to="mms_join" name="成功或失败"/>
+	</node>
+
+	<node id="B_receivePush" name="被叫接收push短信" resourcePrefix="resourceB_" actionType="receivePush">
+        <param name="callNumber" value="${resourceA_.testNum}"/>
+		<transition to="mms_join" name="成功或失败"/>
+	</node>
+	
+	<join id="mms_join">
+		<transition to="B_pppDial" expression="${A_sendMMS.resultCode == 'SUCCESS' &amp;&amp; B_receivePush.resultCode == 'SUCCESS'}"  name="成功" />
+		<transition to="release" name="失败" />
+	</join>
+	
+	<!-- 接收彩信 -->
+	<node id="B_pppDial" name="被叫PPP拨号" resourcePrefix="resourceB_" actionType="pppDial">
+		<param name="apnName" value="${apnName}"/>
+        <param name="apnUser" value="${apnUser}"/>
+        <param name="apnPassword" value="${apnPassword}"/>
+		<transition to="B_getMMS" expression="${B_pppDial.resultCode == 'SUCCESS'}"  />
+		<transition to="release" name="失败"/>
+	</node>
+	
+	<node id="B_getMMS" name="被叫提取彩信" resourcePrefix="resourceB_" actionType="getMMS">
+        <param name="pushUrl" value="${B_receivePush.pushUrl}"/>
+        <param name="protocol" value="${protocol}"/>
+        <param name="gatewayIp" value="${gatewayIp}"/>
+        <param name="gatewayPort" value="${gatewayPort}"/>
+		<transition to="release" name="成功或失败"/>
+	</node>
+	
+	<!-- 资源释放 -->
+    <fork id="release" join="release_join">
+        <transition to="A_pppTerm"  expression="${A_pppDial.resultCode == 'SUCCESS'}"/>
+        <transition to="B_pppTerm"  expression="${B_pppDial != null &amp;&amp; B_pppDial.resultCode == 'SUCCESS'}"/>
+        <transition to="release_join" expression="${A_pppDial.resultCode != 'SUCCESS' &amp;&amp; (B_pppDial == null || B_pppDial.resultCode != 'SUCCESS')}" />
+    </fork>
+
+	<node id="A_pppTerm" name="主叫断开PPP拨号" resourcePrefix="resourceA_" actionType="pppTerm">
+		<transition to="release_join" />
+    </node>
+
+	<node id="B_pppTerm" name="被叫断开PPP拨号" resourcePrefix="resourceB_" actionType="pppTerm">
+		<transition to="release_join" />
+    </node>
+
+	<join id="release_join">
+		<transition to="turnOff" expression="${resourceB_close == true || resourceA_close == true}"/>
+		<transition to="end"/>
+	</join>
+	
+	<fork id="turnOff" name="资源释放" join="turnOff_join">
+        <transition to="A_powerOff" expression="${A_register.resultCode != 'SUCCESS' &amp;&amp; A_powerOn.resoultCode == 'SUCCESS'}"/>
+        <transition to="B_powerOff" expression="${B_register.resultCode  != 'SUCCESS' &amp;&amp; B_powerOn.resoultCode == 'SUCCESS'}"/>
+		<transition to="A_unregister" expression="${resourceA_close == true &amp;&amp; (A_checkRegister.resultCode == 0 || A_register.resultCode == 'SUCCESS')}"/>
+		<transition to="B_unregister" expression="${resourceB_close == true &amp;&amp; (B_checkRegister.resultCode == 0 || B_register.resultCode == 'SUCCESS')}"/>
+	</fork>
+	
+	<node id="A_unregister" name="A_注销网络" resourcePrefix="resourceA_" actionType="unregister">
+		<transition to="A_powerOff" />
+	</node>
+
+	<node id="A_powerOff" name="A_模块断电" resourcePrefix="resourceA_" actionType="powerOff">
+		<transition to="turnOff_join" />
+	</node>
+
+	<node id="B_unregister" name="B_注销网络" resourcePrefix="resourceB_" actionType="unregister">
+		<transition to="B_powerOff" />
+	</node>
+
+	<node id="B_powerOff" name="B_模块断电" resourcePrefix="resourceB_" actionType="powerOff">
+		<transition to="turnOff_join" />
+	</node>
+
+	<join id="turnOff_join">
+		<transition to="end"></transition>
+	</join>
+	
+	<end id="end" name="流程结束" />
+	
+	<result>
+		<variable code="resultCode" name="结果码" value="${resultCode}" javaType="String"  description=""/>
+		<variable code="errorDescription" name="错误描述" value="${errorDescription}" javaType="String"  description=""/>
+		<variable code="sendTime" name="发送时间" value="${A_sendMMS.sendTime}" javaType="String"  description="发送彩信动作"/>
+		<variable code="sendedTime" name="发送完成时间" value="${A_sendMMS.sendedTime}" javaType="String"  description="发送彩信动作"/>
+		<variable code="pushTime" name="Push下发时间" value="${B_receivePush.pushTime}"  javaType="String" description="接收push短信动作"/>
+		<variable code="pushUrl" name="彩信提取地址" value="${B_receivePush.pushUrl}" javaType="String"  description="接收push短信动作"/>
+		<variable code="getTime" name="提取时间" value="${B_getMMS.getTime}" javaType="String"  description="提取彩信动作"/>
+		<variable code="getedTime" name="提取完成时间" value="${B_getMMS.getedTime}" javaType="String"  description="提取彩信动作"/>
+		<variable code="mmsTitle" name="彩信标题" value="${B_getMMS.mmsTitle}" javaType="String"  description="提取彩信动作"/>
+		<variable code="mmsFile" name="彩信文件" value="${B_getMMS.mmsFile}" javaType="String"  description="提取彩信动作"/>
+		<variable code="sendLatency" name="彩信发送时延" value="${interval(A_sendSMS.sendedTime,A_sendSMS.sendTime)}"  javaType="Float"  description="公式：发送完成时间-发送时间"/>
+		<variable code="pushLatency" name="push下发时延" value="${interval(B_receivePush.pushTime,A_sendMMS.sendedTime)}"  javaType="Float"   description="公式：push下发时间－发送完成时间"/>
+		<variable code="getLatency" name="彩信提取时延" value="${interval(B_getMMS.getedTime,B_getMMS.getTime)}"  javaType="Float"   description="公式：提取完成时间-提取时间"/>
+		<variable code="p2pLatency" name="彩信端到端时延" value="${interval(B_getMMS.getedTime,A_sendMMS.sendTime)}"  javaType="Float"   description="公式：提取完成时间-发送时间"/>
+	</result>
+</task>
